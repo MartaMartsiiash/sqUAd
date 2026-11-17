@@ -188,7 +188,7 @@ class RoomService:
             game = {
                 "id": g.id,
                 "title": g.title,
-                "emoji": g.emoji,
+                "tag": g.tag,
                 "rules": g.rules,
                 "player_ids": state.get("player_ids", []),
                 "view": g.view(state, me_id)

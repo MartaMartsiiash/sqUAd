@@ -3,14 +3,26 @@
 from app.domain.room import DomainError
 from app.games.associations import Associations
 from app.games.base import Game
+from app.games.forgotten_words import ForgottenWords
 from app.games.friends_quiz import FriendsQuiz
+from app.games.ni_tak_ni_ni import NiTakNiNi
 from app.games.spy import Spy
 from app.games.two_truths import TwoTruths
 from app.games.who_am_i import WhoAmI
 from app.games.who_of_us import WhoOfUs
 
 GAMES: dict[str, Game] = {
-    g.id: g for g in [Spy(), WhoOfUs(), Associations(), TwoTruths(), WhoAmI(), FriendsQuiz()]
+    g.id: g
+    for g in [
+        WhoOfUs(),
+        NiTakNiNi(),
+        Spy(),
+        Associations(),
+        TwoTruths(),
+        ForgottenWords(),
+        WhoAmI(),
+        FriendsQuiz(),
+    ]
 }
 
 

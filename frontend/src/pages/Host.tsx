@@ -23,11 +23,12 @@ export default function Host() {
 
   return (
     <Page>
-      <h1 className="pop mb-4 text-center text-2xl font-bold">👑 Нова кімната</h1>
+      <span className="label">Ведучий</span>
+      <h1 className="display pop mb-6 mt-2 text-4xl">Нова кімната</h1>
       <NameForm
         submitLabel="Створити кімнату"
-        onSubmit={async (name, emoji) => {
-          const res = await api.createRoom(account.token, name, emoji);
+        onSubmit={async (name) => {
+          const res = await api.createRoom(account.token, name);
           session.set(res.code, res.token);
           navigate(`/room/${res.code}`);
         }}

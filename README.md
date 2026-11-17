@@ -3,8 +3,9 @@
 **sqUAd** is a website for playing party games with friends in one room, in
 Ukrainian. The host creates a room and gets a five-character code (and a QR
 code). Everyone opens the site on their own phone, types the code and a name,
-and plays: Spy, "Who of us…?", Associations, Two truths and a lie, and premium
-games unlocked by a donation. One scoreboard follows the group all evening.
+and plays: "Who of us…?", "Ні так, ні ні" (no yes, no no), Spy, Associations, Two
+truths and a lie, and premium games unlocked by a donation, such as "Забуті слова",
+a bluffing game with forgotten Ukrainian words. One scoreboard follows the group all evening.
 
 > The name is *squad* with **UA** inside: games for your squad, in Ukrainian.
 
@@ -26,7 +27,7 @@ games unlocked by a donation. One scoreboard follows the group all evening.
 | Folder | What is inside |
 |---|---|
 | `backend/` | FastAPI app: domain model (Room, Player), games, repositories (DynamoDB / in-memory), services, HTTP API, tests |
-| `frontend/` | React + Vite + TypeScript + Tailwind site: home, join, lobby, game screens, scoreboard |
+| `frontend/` | React + Vite + TypeScript + Tailwind site: home, join, lobby, game screens, scoreboard; dark and light theme |
 | `infra/` | Terraform for AWS: DynamoDB, Lambda + function URL, Cognito, S3 + CloudFront |
 | `docs/` | Architecture decisions and game rules |
 
@@ -51,7 +52,7 @@ needed) and rooms live in memory. Open the room link in a few browser windows
 (or a private window) to play as several people.
 
 ```bash
-make test         # 21 backend tests
+make test         # backend tests
 make lint         # ruff, ESLint, TypeScript
 ```
 

@@ -1,5 +1,5 @@
 import { Waiting } from "../components/ui";
-import { Big, NextButton, PhaseHeader, Progress } from "./common";
+import { NextButton, PhaseHeader, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
 export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps) {
@@ -10,13 +10,13 @@ export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps
   if (view.phase === "pick") {
     return (
       <div>
-        <PhaseHeader title={`Раунд ${view.round} з ${view.rounds}`} deadline={view.deadline} offset={offset} />
-        <p className="mb-3 text-center text-lg">
+        <PhaseHeader title={`Раунд ${view.round} / ${view.rounds}`} deadline={view.deadline} offset={offset} />
+        <p className="mb-4 text-center text-lg">
           {view.is_subject ? (
-            <>Ти — герой раунду! Обери чесно 🤫</>
+            "Ти герой раунду. Обери чесно"
           ) : (
             <>
-              Що обрав(ла) <b>{subject?.emoji} {subject?.name}</b>?
+              Що обрав(ла) <b>{subject?.name}</b>?
             </>
           )}
         </p>
@@ -25,12 +25,8 @@ export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps
             <button
               key={option}
               onClick={() => act({ type: "pick", choice: i })}
-              className={`rounded-3xl border-2 px-3 py-8 text-xl font-black transition active:scale-95 ${
-                view.my_answer === i
-                  ? "border-yellow bg-yellow/20"
-                  : i === 0
-                    ? "border-blue/50 bg-blue/15"
-                    : "border-yellow/40 bg-yellow/10"
+              className={`rounded-[24px] border px-3 py-10 font-display text-lg font-semibold uppercase transition active:scale-95 ${
+                view.my_answer === i ? "border-red bg-red text-on-red" : "border-line bg-bg/40"
               }`}
             >
               {option}
@@ -46,17 +42,18 @@ export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps
     const choice = view.last.choice as number | null;
     return (
       <div>
-        <PhaseHeader title={`${subject?.emoji} ${subject?.name}`} deadline={view.deadline} offset={offset} />
+        <PhaseHeader title={subject?.name} deadline={view.deadline} offset={offset} />
         {choice === null ? (
-          <Waiting>Герой не встиг обрати 🙈</Waiting>
+          <Waiting>Герой не встиг обрати</Waiting>
         ) : (
-          <Big>
-            <p className="text-sm uppercase tracking-wider text-slate-300">Обрав(ла)</p>
-            <div className="mt-1 text-4xl font-black">{pair[choice]}</div>
-            <p className="mt-2 text-slate-300">
-              Вгадали: {(view.last.right as string[]).map((id) => byId[id]?.name).filter(Boolean).join(", ") || "ніхто 😅"}
+          <Spotlight>
+            <p className="label text-fg">Обрав(ла)</p>
+            <p className="display mt-3 text-4xl">{pair[choice]}</p>
+            <p className="mt-3 text-muted">
+              Вгадали:{" "}
+              {(view.last.right as string[]).map((id) => byId[id]?.name).filter(Boolean).join(", ") || "ніхто"}
             </p>
-          </Big>
+          </Spotlight>
         )}
         <NextButton act={act} />
       </div>
@@ -64,8 +61,8 @@ export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps
   }
 
   return (
-    <Big>
-      <div className="text-2xl font-black">Гру завершено! 💛</div>
-    </Big>
+    <Spotlight tone="dark">
+      <p className="display text-2xl">Гру завершено</p>
+    </Spotlight>
   );
 }

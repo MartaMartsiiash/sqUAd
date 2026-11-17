@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Waiting } from "../components/ui";
-import { Big, NextButton, PhaseHeader, Progress } from "./common";
+import { NextButton, PhaseHeader, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
 export default function TwoTruths({ room, view, me, byId, offset, act }: GameProps) {
@@ -13,7 +13,7 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
       return (
         <div>
           <PhaseHeader title="Факти про себе" deadline={view.deadline} offset={offset} />
-          <Waiting>Записано! Чекаємо, поки інші допишуть...</Waiting>
+          <Waiting>Записано. Чекаємо, поки інші допишуть</Waiting>
           <Progress done={view.submitted.length} total={total} label="готові" />
         </div>
       );
@@ -21,8 +21,8 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
     const ready = facts.every((f) => f.trim()) && lie !== null;
     return (
       <div>
-        <PhaseHeader title="Дві правди й одна брехня" deadline={view.deadline} offset={offset} />
-        <p className="mb-3 text-sm text-slate-300">Напиши 3 факти про себе і познач, який із них вигаданий 🤥</p>
+        <PhaseHeader title="Дві правди, одна брехня" deadline={view.deadline} offset={offset} />
+        <p className="mb-3 text-sm text-muted">Напиши три факти про себе й познач вигаданий</p>
         <div className="space-y-2">
           {facts.map((f, i) => (
             <div key={i} className="flex gap-2">
@@ -35,19 +35,17 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
               <button
                 type="button"
                 onClick={() => setLie(i)}
-                className={`rounded-2xl px-3 text-xl ${lie === i ? "bg-red-500/30 ring-2 ring-red-400" : "bg-ink/50"}`}
-                aria-label={`Факт ${i + 1} — брехня`}
+                className={`shrink-0 rounded-2xl border px-3 font-mono text-xs uppercase tracking-wider ${
+                  lie === i ? "border-red bg-red text-on-red" : "border-line text-muted"
+                }`}
+                aria-pressed={lie === i}
               >
-                🤥
+                брехня
               </button>
             </div>
           ))}
         </div>
-        <button
-          className="btn-primary mt-4 w-full"
-          disabled={!ready}
-          onClick={() => act({ type: "submit", facts, lie })}
-        >
+        <button className="btn-primary mt-4 w-full" disabled={!ready} onClick={() => act({ type: "submit", facts, lie })}>
           Готово
         </button>
         <Progress done={view.submitted.length} total={total} label="готові" />
@@ -60,9 +58,9 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
     const mine = view.author === me.id;
     return (
       <div>
-        <PhaseHeader title={`${view.turn} з ${view.turns}`} deadline={view.deadline} offset={offset} />
-        <p className="mb-3 text-center text-lg">
-          Факти про <b>{author?.emoji} {author?.name}</b>. Де брехня?
+        <PhaseHeader title={`${view.turn} / ${view.turns}`} deadline={view.deadline} offset={offset} />
+        <p className="mb-4 text-center text-lg">
+          Факти про <b>{author?.name}</b>. Де брехня?
         </p>
         <div className="space-y-2">
           {(view.facts as string[]).map((f, i) => (
@@ -71,14 +69,14 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
               disabled={mine}
               onClick={() => act({ type: "guess", choice: i })}
               className={`w-full rounded-2xl border px-4 py-4 text-left font-semibold transition active:scale-[0.98] ${
-                view.my_guess === i ? "border-yellow bg-yellow/15" : "border-line bg-ink/50"
+                view.my_guess === i ? "border-red bg-red/15" : "border-line bg-bg/40"
               }`}
             >
               {f}
             </button>
           ))}
         </div>
-        {mine && <p className="mt-3 text-center text-slate-400">Це твої факти — тримай обличчя 😐</p>}
+        {mine && <p className="label mt-4 text-center">Це твої факти. Тримай обличчя</p>}
         <Progress done={view.guessed.length} total={total - 1} label="вгадали" />
       </div>
     );
@@ -87,22 +85,22 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
   if (view.phase === "reveal" && view.last) {
     return (
       <div>
-        <PhaseHeader title={`${author?.emoji} ${author?.name}`} deadline={view.deadline} offset={offset} />
+        <PhaseHeader title={author?.name} deadline={view.deadline} offset={offset} />
         <div className="space-y-2">
           {(view.facts as string[]).map((f, i) => (
             <div
               key={i}
-              className={`rounded-2xl px-4 py-4 font-semibold ${
-                i === view.last.lie ? "bg-red-500/25 ring-2 ring-red-400" : "bg-blue/15"
+              className={`rounded-2xl border px-4 py-4 font-semibold ${
+                i === view.last.lie ? "border-red bg-red/15" : "border-line bg-bg/40"
               }`}
             >
-              {i === view.last.lie ? "🤥 " : "✅ "}
+              <span className="label mr-2">{i === view.last.lie ? "брехня" : "правда"}</span>
               {f}
             </div>
           ))}
         </div>
-        <p className="mt-3 text-center text-slate-300">
-          Обдурено: <b>{view.last.fooled}</b> → +{view.last.fooled} автору
+        <p className="mt-4 text-center text-muted">
+          Обдурено: <b className="text-fg">{view.last.fooled}</b> · автору +{view.last.fooled}
         </p>
         <NextButton act={act} />
       </div>
@@ -110,8 +108,8 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
   }
 
   return (
-    <Big>
-      <div className="text-2xl font-black">Гру завершено! 🤥</div>
-    </Big>
+    <Spotlight tone="dark">
+      <p className="display text-2xl">Гру завершено</p>
+    </Spotlight>
   );
 }

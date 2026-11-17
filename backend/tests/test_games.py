@@ -115,3 +115,46 @@ def test_timer_moves_the_game_on(client, room_with_players, clock):
     clock.advance(13)
     v = view(client, code, t["Олег"])["game"]["view"]
     assert v["phase"] == "write" and v["round"] == 2
+
+
+def test_ni_tak_ni_ni_caught_and_timeout(client, room_with_players, clock):
+    code, t = room_with_players
+    ids = ids_by_name(client, code, t["Марта"])
+    names = {v: k for k, v in ids.items()}
+    v = start(client, code, t["Марта"], "ni_tak_ni_ni", turns=2)["game"]["view"]
+    hot = names[v["hot"]]
+    hot_view = view(client, code, t[hot])["game"]["view"]
+    assert hot_view["questions"] is None and "так" in hot_view["forbidden"]
+    act(client, code, t[hot], type="begin")
+    clock.advance(65)
+    catcher = next(n for n in t if n != hot)
+    v = act(client, code, t[catcher], type="caught")["game"]["view"]
+    assert v["phase"] == "result" and v["last"]["survived"] == 65 and v["last"]["earned"] == 2
+    act(client, code, t[catcher], type="next")
+    hot2 = names[view(client, code, t["Марта"])["game"]["view"]["hot"]]
+    act(client, code, t[hot2], type="begin")
+    clock.advance(121)
+    final = view(client, code, t["Марта"])
+    assert final["game"]["view"]["last"]["survived"] == 120
+    clock.advance(20)
+    final = view(client, code, t["Марта"])
+    assert final["game"]["view"]["phase"] == "finished"
+    assert final["scores"][ids[hot]] == 2 and final["scores"][ids[hot2]] >= 4
+
+
+def test_forgotten_words_bluff(client, room_with_players, rooms):
+    code, t = room_with_players
+    rooms.unlock_premium(code)
+    start(client, code, t["Марта"], "forgotten_words", rounds=1)
+    for i, tok in enumerate(t.values()):
+        act(client, code, tok, type="fake", text=f"вигадка {i % 2}")
+    v = view(client, code, t["Олег"])["game"]["view"]
+    assert v["phase"] == "vote"
+    assert len(v["options"]) == 3  # the real one + two different fakes
+    assert all("authors" not in o for o in v["options"])
+    for tok in t.values():
+        mine = view(client, code, tok)["game"]["view"]["options"]
+        choice = next(o["id"] for o in mine if not o["mine"])
+        act(client, code, tok, type="vote", option=choice)
+    v = view(client, code, t["Марта"])["game"]["view"]
+    assert v["phase"] == "reveal" and v["last"]["real_id"]

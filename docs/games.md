@@ -5,12 +5,14 @@ Every game is one class in `backend/app/games/` and one screen in
 
 | Game | Type | Players | How it works | Points |
 |---|---|---|---|---|
-| 🕵️ Шпигун | free | 3+ | Everyone sees the same place, except the spy. Ask questions, then vote. | Spy caught: +1 to everyone else, the spy may guess the place for +2. Not caught: spy +3 |
-| 👉 Хто з нас...? | free | 3+ | "Who of us would most likely…?" Everyone votes secretly. | +1 for voting with the majority |
-| 🧠 Асоціації | free | 3+ | One word; everyone writes their first association in 30 s. | +1 for every other player who wrote the same |
-| 🤥 Правда чи брехня | free | 3+ | Each writes two truths and a lie about themselves; others find the lie. | +1 for finding the lie; the author +1 per fooled player |
-| 🎭 Хто я? | premium | 3+ | You see everyone's character but your own; ask yes/no questions. | Earlier guess, more points |
-| 💛 Квіз про друзів | premium | 3+ | The round's subject secretly picks "море чи гори?"; others guess. | +1 for a right guess; subject +1 if half guessed right |
+| Хто з нас...? | free | 3+ | "Who of us would most likely…?" Everyone votes secretly. | +1 for voting with the majority |
+| Ні так, ні ні | free | 3+ | Ni Oui Ni Non: each player in turn answers questions for 2 minutes without "так", "ні" and their synonyms (highlighted as forbidden). The others get provocative questions on their phones and press "Попався!". | +1 per 30 s survived; +1 to whoever caught them |
+| Шпигун | free | 3+ | Everyone sees the same place, except the spy. Ask questions, then vote. | Spy caught: +1 to everyone else, the spy may guess the place for +2. Not caught: spy +3 |
+| Асоціації | free | 3+ | One word; everyone writes their first association in 30 s. | +1 for every other player who wrote the same |
+| Правда чи брехня | free | 3+ | Each writes two truths and a lie about themselves; others find the lie. | +1 for finding the lie; the author +1 per fooled player |
+| Забуті слова | premium | 3+ | An old or regional Ukrainian word (бамбетель, шпихлір, кнайпа…). Everyone invents a believable meaning, then all vote for the real one. | +2 for finding the real meaning; +1 per player fooled by your invention |
+| Хто я? | premium | 3+ | You see everyone's character but your own; ask yes/no questions. | Earlier guess, more points |
+| Квіз про друзів | premium | 3+ | The round's subject secretly picks "море чи гори?"; others guess. | +1 for a right guess; subject +1 if half guessed right |
 
 ## Adding a game
 1. `backend/app/games/<name>.py`: a class that inherits `Game` and implements

@@ -3,8 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError, session } from "../api/client";
 import { ErrorNote, Page } from "../components/ui";
 
-export const EMOJIS = ["🦊", "🐸", "🐼", "🦄", "🐙", "🐝", "🦉", "🐯", "🐨", "🐵", "🐧", "🐢", "🦖", "🐳", "🦋", "🐞"];
-
 const NAME_KEY = "squad:name";
 
 export function NameForm({
@@ -12,10 +10,15 @@ export function NameForm({
   onSubmit,
 }: {
   submitLabel: string;
-  onSubmit: (name: string, emoji: string) => Promise<void>;
+  onSubmit: (name: string) => Promise<void>;
 }) {
-  const [name, setName] = useState(() => localStorage.getItem(NAME_KEY) ?? "");
-  const [emoji, setEmoji] = useState(() => EMOJIS[Math.floor(Math.random() * EMOJIS.length)]);
+  const [name, setName] = useState(() => {
+    try {
+      return localStorage.getItem(NAME_KEY) ?? "";
+    } catch {
+      return "";
+    }
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +27,12 @@ export function NameForm({
     setBusy(true);
     setError(null);
     try {
-      localStorage.setItem(NAME_KEY, name.trim());
-      await onSubmit(name.trim(), emoji);
+      try {
+        localStorage.setItem(NAME_KEY, name.trim());
+      } catch {
+        /* private mode */
+      }
+      await onSubmit(name.trim());
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Щось пішло не так");
       setBusy(false);
@@ -33,36 +40,21 @@ export function NameForm({
   };
 
   return (
-    <form onSubmit={submit} className="card">
-      <label htmlFor="name" className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+    <form onSubmit={submit} className="card pop">
+      <label htmlFor="name" className="label">
         Як тебе звати?
       </label>
       <input
         id="name"
-        className="input mt-2"
+        className="input mt-3"
         value={name}
         onChange={(e) => setName(e.target.value.slice(0, 20))}
         placeholder="Ім'я або нікнейм"
         autoFocus
         maxLength={20}
+        autoComplete="nickname"
       />
-      <p className="mt-4 text-sm font-semibold uppercase tracking-wider text-slate-400">Твій аватар</p>
-      <div className="mt-2 grid grid-cols-8 gap-2">
-        {EMOJIS.map((e) => (
-          <button
-            type="button"
-            key={e}
-            onClick={() => setEmoji(e)}
-            className={`aspect-square rounded-xl text-2xl transition ${
-              e === emoji ? "scale-110 bg-yellow/25 ring-2 ring-yellow" : "bg-ink/50"
-            }`}
-            aria-label={`Аватар ${e}`}
-          >
-            {e}
-          </button>
-        ))}
-      </div>
-      <button className="btn-primary mt-5 w-full text-lg" disabled={busy || !name.trim()}>
+      <button className="btn-primary mt-4 w-full" disabled={busy || !name.trim()}>
         {busy ? "Секунду..." : submitLabel}
       </button>
       <ErrorNote text={error} />
@@ -82,13 +74,12 @@ export default function Join() {
 
   return (
     <Page>
-      <h1 className="pop mb-4 text-center text-2xl font-bold">
-        Кімната <span className="font-mono tracking-widest text-yellow">{upper}</span>
-      </h1>
+      <span className="label">Кімната</span>
+      <h1 className="display pop mb-6 mt-2 font-mono text-5xl tracking-[0.2em] text-red">{upper}</h1>
       <NameForm
         submitLabel="Увійти в кімнату"
-        onSubmit={async (name, emoji) => {
-          const res = await api.join(upper, name, emoji);
+        onSubmit={async (name) => {
+          const res = await api.join(upper, name);
           session.set(res.code, res.token);
           navigate(`/room/${res.code}`, { replace: true });
         }}

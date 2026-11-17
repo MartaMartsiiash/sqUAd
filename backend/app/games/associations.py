@@ -22,7 +22,7 @@ def normalize(word: str) -> str:
 class Associations(Game):
     id = "associations"
     title = "Асоціації"
-    emoji = "🧠"
+    tag = "швидкість · збіги"
     description = "Думай як твоя компанія."
     rules = (
         "З'являється слово. За 30 секунд кожен пише одну асоціацію. За кожного, хто "

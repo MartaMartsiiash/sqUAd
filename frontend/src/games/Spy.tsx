@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Waiting } from "../components/ui";
-import { Big, PhaseHeader, PlayerPicker, Progress } from "./common";
+import { PhaseHeader, PlayerPicker, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
 export default function Spy({ room, view, me, byId, offset, act }: GameProps) {
@@ -19,35 +19,34 @@ export default function Spy({ room, view, me, byId, offset, act }: GameProps) {
           onPointerDown={() => setShown(true)}
           onPointerUp={() => setShown(false)}
           onPointerLeave={() => setShown(false)}
-          onClick={(e) => e.preventDefault()}
         >
           {shown ? (
             view.is_spy ? (
-              <Big tone="red">
-                <div className="text-5xl">🕵️</div>
-                <div className="mt-2 text-2xl font-black">Ти шпигун!</div>
-                <p className="mt-1 text-sm text-slate-300">Вгадай локацію з розмови й не видай себе</p>
-              </Big>
+              <Spotlight tone="red">
+                <p className="label text-fg">Твоя роль</p>
+                <p className="display mt-3 text-4xl text-red">Шпигун</p>
+                <p className="mt-3 text-sm text-muted">Вгадай локацію з розмови й не видай себе</p>
+              </Spotlight>
             ) : (
-              <Big tone="blue">
-                <p className="text-sm uppercase tracking-wider text-slate-300">Локація</p>
-                <div className="mt-2 text-3xl font-black">{view.location}</div>
-              </Big>
+              <Spotlight tone="dark">
+                <p className="label">Локація</p>
+                <p className="display mt-3 text-3xl">{view.location}</p>
+              </Spotlight>
             )
           ) : (
-            <div className="rounded-3xl border-2 border-dashed border-line p-10 text-center text-slate-300">
-              <div className="text-5xl">👆</div>
-              <p className="mt-2 font-semibold">Затисни, щоб побачити свою роль</p>
+            <div className="rounded-[24px] border border-dashed border-line px-6 py-12 text-center">
+              <p className="display text-xl">Затисни</p>
+              <p className="label mt-2">щоб побачити свою роль</p>
             </div>
           )}
         </button>
-        <p className="mt-4 text-center text-slate-300">
-          Першим питає: <b>{byId[view.first_asker]?.emoji} {byId[view.first_asker]?.name}</b>
+        <p className="mt-4 text-center text-muted">
+          Першим питає <b className="text-fg">{byId[view.first_asker]?.name}</b>
         </p>
-        <button className="btn-blue mt-4 w-full" onClick={() => act({ type: "ready_to_vote" })}>
-          🗳 Готові голосувати
+        <button className="btn-primary mt-4 w-full" onClick={() => act({ type: "ready_to_vote" })}>
+          Готові голосувати
         </button>
-        <Progress done={view.ready_count} total={total} label="готові (потрібна більшість)" />
+        <Progress done={view.ready_count} total={total} label="готові · потрібна більшість" />
       </div>
     );
   }
@@ -70,47 +69,40 @@ export default function Spy({ room, view, me, byId, offset, act }: GameProps) {
   if (view.phase === "spy_guess") {
     return (
       <div>
-        <PhaseHeader title="Шпигуна впіймали!" deadline={view.deadline} offset={offset} />
+        <PhaseHeader title="Шпигуна впіймали" deadline={view.deadline} offset={offset} />
         {view.is_spy ? (
           <>
-            <p className="mb-3 text-center text-slate-300">Останній шанс: вгадай локацію і забери 2 бали</p>
+            <p className="mb-3 text-center">Останній шанс: вгадай локацію і забери 2 бали</p>
             <div className="grid grid-cols-2 gap-2">
               {(view.options as string[]).map((o) => (
-                <button key={o} className="btn-ghost text-sm" onClick={() => act({ type: "guess", location: o })}>
+                <button key={o} className="btn-ghost px-3 text-xs" onClick={() => act({ type: "guess", location: o })}>
                   {o}
                 </button>
               ))}
             </div>
           </>
         ) : (
-          <Waiting>
-            {byId[view.spy]?.emoji} {byId[view.spy]?.name} вгадує локацію...
-          </Waiting>
+          <Waiting>{byId[view.spy]?.name} вгадує локацію...</Waiting>
         )}
       </div>
     );
   }
 
-  // finished
   const caught = view.accused === view.spy;
   return (
-    <div>
-      <Big tone={caught ? "blue" : "red"}>
-        <p className="text-sm uppercase tracking-wider text-slate-300">Шпигун</p>
-        <div className="mt-1 text-3xl font-black">
-          {byId[view.spy]?.emoji} {byId[view.spy]?.name}
-        </div>
-        <p className="mt-2 text-slate-200">
-          Локація: <b>{view.location}</b>
-        </p>
-        <p className="mt-3 text-lg font-bold">
-          {caught
-            ? view.spy_guess === view.location
-              ? "Впіймали, але шпигун вгадав локацію! 😎"
-              : "Шпигуна впіймали! 🎉"
-            : "Шпигун переміг 🕵️"}
-        </p>
-      </Big>
-    </div>
+    <Spotlight tone={caught ? "dark" : "red"}>
+      <p className="label">Шпигун</p>
+      <p className="display mt-2 text-3xl">{byId[view.spy]?.name}</p>
+      <p className="mt-3 text-muted">
+        Локація: <b className="text-fg">{view.location}</b>
+      </p>
+      <p className="display mt-4 text-lg text-red">
+        {caught
+          ? view.spy_guess === view.location
+            ? "Впіймали, але локацію вгадано"
+            : "Шпигуна впіймали"
+          : "Шпигун переміг"}
+      </p>
+    </Spotlight>
   );
 }

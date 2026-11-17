@@ -16,7 +16,7 @@ export type GameMeta = {
   title: string;
   description: string;
   rules: string;
-  emoji: string;
+  tag: string;
   min_players: number;
   premium: boolean;
   locked: boolean;
@@ -42,7 +42,7 @@ export type RoomView = {
   game: null | {
     id: string;
     title: string;
-    emoji: string;
+    tag: string;
     rules: string;
     player_ids: string[];
     view: GameView;
@@ -80,6 +80,7 @@ async function request<T>(path: string, init: RequestInit & { token?: string; au
 type Joined = { code: string; player_id: string; token: string };
 
 export const api = {
+  games: () => request<GameMeta[]>("/api/games"),
   createRoom: (auth: string, name: string, emoji?: string) =>
     request<Joined>("/api/rooms", { method: "POST", auth, body: JSON.stringify({ name, emoji }) }),
   join: (code: string, name: string, emoji?: string) =>

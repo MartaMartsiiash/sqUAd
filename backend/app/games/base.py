@@ -23,7 +23,7 @@ class Game(ABC):
     title: str = ""
     description: str = ""
     rules: str = ""
-    emoji: str = "🎲"
+    tag: str = ""
     min_players: int = 3
     premium: bool = False
 
@@ -33,7 +33,7 @@ class Game(ABC):
             "title": self.title,
             "description": self.description,
             "rules": self.rules,
-            "emoji": self.emoji,
+            "tag": self.tag,
             "min_players": self.min_players,
             "premium": self.premium,
         }
