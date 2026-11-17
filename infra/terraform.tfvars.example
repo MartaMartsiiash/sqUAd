@@ -1,6 +1,6 @@
 # Copy to terraform.tfvars (gitignored) and fill in.
 project_name = "squad"
-region       = "eu-central-1"
+region       = "eu-north-1"
 
 # The same Google OAuth client as in spry works; add google_redirect_uri (an output) to it.
 google_client_id = ""

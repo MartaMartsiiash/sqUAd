@@ -6,8 +6,8 @@ variable "project_name" {
 
 variable "region" {
   type        = string
-  default     = "eu-central-1"
-  description = "Frankfurt: the closest AWS region to Ukraine."
+  default     = "eu-north-1"
+  description = "Stockholm: the region the course AWS organisation allows (its policy denies others)."
 }
 
 variable "google_client_id" {
