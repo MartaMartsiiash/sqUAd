@@ -127,31 +127,8 @@ export default function Room() {
   const Screen = game ? SCREENS[game.id] : null;
   const act = (action: object) => run(() => api.act(upper, token, action));
 
-  return (
-    <Page>
-      <div className="mb-5 flex items-end justify-between gap-3">
-        <div>
-          <span className="label">Кімната</span>
-          <p className="mt-1 font-mono text-3xl font-semibold tracking-[0.25em] text-red">{room.code}</p>
-        </div>
-        <div className="flex rounded-full border border-line p-1">
-          {(["game", "score"] as const).map((t) => (
-            <button
-              key={t}
-              className={`rounded-full px-4 py-2 font-mono text-[0.7rem] uppercase tracking-[0.14em] transition ${
-                tab === t ? "bg-fg text-bg" : "text-muted"
-              }`}
-              onClick={() => setTab(t)}
-            >
-              {t === "game" ? (game ? "Гра" : "Лобі") : "Табло"}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {tab === "score" ? (
-        <Scoreboard room={room} byId={byId} />
-      ) : game && Screen ? (
+  const main =
+    game && Screen ? (
         <div className="card pop">
           <div className="mb-5 flex items-start justify-between gap-3 border-b border-line pb-4">
             <div className="min-w-0">
@@ -185,10 +162,45 @@ export default function Room() {
             </div>
           )}
         </div>
-      ) : (
-        <Lobby room={room} token={token} isHost={isHost} run={run} />
-      )}
-      <ErrorNote text={actionError} />
+    ) : (
+      <Lobby room={room} token={token} isHost={isHost} run={run} />
+    );
+
+  return (
+    <Page wide>
+      <div className="mb-5 flex items-end justify-between gap-3">
+        <div>
+          <span className="label">Кімната</span>
+          <p className="mt-1 font-mono text-3xl font-semibold tracking-[0.25em] text-red">{room.code}</p>
+        </div>
+        {/* On a phone the scoreboard is a tab; on a laptop it stays on the right. */}
+        <div className="flex rounded-full border border-line p-1 lg:hidden">
+          {(["game", "score"] as const).map((t) => (
+            <button
+              key={t}
+              className={`rounded-full px-4 py-2 font-mono text-[0.7rem] uppercase tracking-[0.14em] transition ${
+                tab === t ? "bg-fg text-bg" : "text-muted"
+              }`}
+              onClick={() => setTab(t)}
+            >
+              {t === "game" ? (game ? "Гра" : "Лобі") : "Табло"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-6">
+        <div className={tab === "score" ? "hidden lg:block" : ""}>
+          {main}
+          <ErrorNote text={actionError} />
+        </div>
+        <div className={tab === "score" ? "lg:hidden" : "hidden"}>
+          <Scoreboard room={room} byId={byId} />
+        </div>
+        <aside className="hidden lg:sticky lg:top-6 lg:block">
+          <Scoreboard room={room} byId={byId} />
+        </aside>
+      </div>
     </Page>
   );
 }
@@ -229,6 +241,7 @@ function Lobby({ room, token, isHost, run }: {
 
   return (
     <div className="space-y-4">
+      <div className="space-y-4">
       <div className="card pop relative overflow-hidden text-center">
         <ChromeSquiggle className="pointer-events-none absolute -right-3 -top-3 w-28 rotate-12" />
         {showQr && (
@@ -274,6 +287,8 @@ function Lobby({ room, token, isHost, run }: {
             />
           ))}
         </div>
+      </div>
+
       </div>
 
       <div className="card">

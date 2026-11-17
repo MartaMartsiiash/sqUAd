@@ -20,7 +20,7 @@ export function ThemeToggle() {
   );
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#070707" : "#dedede");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#070707" : "#cfcfcf");
     try {
       localStorage.setItem("squad:theme", theme);
     } catch {
@@ -46,7 +46,7 @@ export function ThemeToggle() {
 export function Header() {
   const { account, signOut } = useAuth();
   return (
-    <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-5 pt-5">
+    <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-5 pt-5 lg:px-8">
       <Link to="/" aria-label="На головну">
         <Logo className="text-2xl" />
       </Link>
@@ -71,9 +71,12 @@ export function Header() {
 
 export function Page({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="relative flex min-h-full flex-col overflow-x-clip">
+      {/* Chrome loops in the margins: only on wide screens, where there is room for them. */}
+      <ChromeSquiggle variant={1} className="pointer-events-none fixed -left-8 bottom-10 hidden w-44 -rotate-12 opacity-90 xl:block" />
+      <ChromeSquiggle variant={2} className="pointer-events-none fixed right-4 top-28 hidden w-32 rotate-[25deg] opacity-90 xl:block" />
       <Header />
-      <main className={`relative mx-auto w-full flex-1 px-5 pb-20 pt-6 ${wide ? "max-w-5xl" : "max-w-xl"}`}>
+      <main className={`relative mx-auto w-full flex-1 px-5 pb-20 pt-6 ${wide ? "max-w-5xl lg:px-8" : "max-w-xl"}`}>
         {children}
       </main>
     </div>
@@ -172,8 +175,8 @@ export function ChromeBlob({ className = "" }: { className?: string }) {
           <stop offset="1" stopColor="#3a3a3a" />
         </linearGradient>
         <radialGradient id="redglint" cx="0.7" cy="0.75" r="0.45">
-          <stop offset="0" stopColor="#d1102f" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#d1102f" stopOpacity="0" />
+          <stop offset="0" stopColor="#a5102e" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#a5102e" stopOpacity="0" />
         </radialGradient>
         <radialGradient id="shine" cx="0.32" cy="0.25" r="0.3">
           <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
@@ -206,37 +209,38 @@ export function ChromeBlob({ className = "" }: { className?: string }) {
   );
 }
 
-/** A word in red script that looks like a glossy tube of glass, as in the references. */
-export function TubeScript({ text, className = "" }: { text: string; className?: string }) {
+/** A glossy cherry-red ribbon, like a tube of glass, laid across the wordmark. */
+export function RedRibbon({ className = "" }: { className?: string }) {
+  const d = "M6 150 C 90 40, 170 40, 230 120 S 370 210, 440 120 S 560 20, 640 80";
   return (
-    <svg viewBox="0 0 600 220" className={className} aria-hidden>
+    <svg viewBox="0 0 650 230" className={className} aria-hidden>
       <defs>
-        <linearGradient id="tube" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ff6b7d" />
-          <stop offset="0.35" stopColor="#c80f2c" />
-          <stop offset="1" stopColor="#5a000f" />
+        <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#d23a56" />
+          <stop offset="0.4" stopColor="#8f0b27" />
+          <stop offset="1" stopColor="#3d0410" />
         </linearGradient>
-        <filter id="tubeShadow" x="-10%" y="-10%" width="120%" height="140%">
-          <feDropShadow dx="0" dy="10" stdDeviation="10" floodColor="#000" floodOpacity="0.55" />
+        <filter id="ribbonShadow" x="-10%" y="-20%" width="120%" height="160%">
+          <feDropShadow dx="0" dy="12" stdDeviation="10" floodColor="#000" floodOpacity="0.55" />
         </filter>
       </defs>
-      <g fontFamily="Yellowtail, cursive" fontSize="190" textAnchor="middle" strokeLinejoin="round" strokeLinecap="round">
-        {/* body of the tube */}
-        <text x="300" y="165" fill="url(#tube)" stroke="#6b0013" strokeWidth="6" filter="url(#tubeShadow)">
-          {text}
-        </text>
-        {/* the light running along the top of the tube */}
-        <text x="297" y="160" fill="none" stroke="#ffd6dc" strokeOpacity="0.55" strokeWidth="2.2">
-          {text}
-        </text>
-      </g>
+      <path d={d} fill="none" stroke="#2b030a" strokeWidth="26" strokeLinecap="round" filter="url(#ribbonShadow)" />
+      <path d={d} fill="none" stroke="url(#ribbon)" strokeWidth="22" strokeLinecap="round" />
+      {/* the light running along the top of the tube */}
+      <path d={d} fill="none" stroke="#f3c9d1" strokeOpacity="0.6" strokeWidth="3" strokeLinecap="round" transform="translate(-2 -6)" />
     </svg>
   );
 }
 
 /** A loop of liquid chrome, the small decorative element from the references. */
-export function ChromeSquiggle({ className = "" }: { className?: string }) {
-  const d = "M40 150 C 40 60, 150 40, 170 100 C 190 160, 110 190, 100 140 C 90 90, 200 60, 250 110 C 290 150, 260 200, 220 190";
+const SQUIGGLES = [
+  "M40 150 C 40 60, 150 40, 170 100 C 190 160, 110 190, 100 140 C 90 90, 200 60, 250 110 C 290 150, 260 200, 220 190",
+  "M60 60 C 140 20, 200 80, 150 120 C 100 160, 60 120, 110 90 C 170 55, 260 120, 220 180 C 200 205, 150 200, 160 170",
+  "M30 120 C 70 40, 130 60, 120 110 C 110 160, 170 190, 210 140 C 240 100, 200 50, 170 80 C 150 100, 200 150, 270 120",
+];
+
+export function ChromeSquiggle({ className = "", variant = 0 }: { className?: string; variant?: number }) {
+  const d = SQUIGGLES[variant % SQUIGGLES.length];
   return (
     <svg viewBox="0 0 300 230" className={className} aria-hidden>
       <defs>
@@ -255,7 +259,7 @@ export function ChromeSquiggle({ className = "" }: { className?: string }) {
       <path d={d} fill="none" stroke="#2a2a2a" strokeWidth="30" strokeLinecap="round" filter="url(#sq-shadow)" />
       <path d={d} fill="none" stroke="url(#sq-chrome)" strokeWidth="26" strokeLinecap="round" />
       <path d={d} fill="none" stroke="#ffffff" strokeOpacity="0.7" strokeWidth="4" strokeLinecap="round" transform="translate(-4 -6)" />
-      <path d={d} fill="none" stroke="#d1102f" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" transform="translate(5 7)" />
+      <path d={d} fill="none" stroke="#8f0b27" strokeOpacity="0.4" strokeWidth="3" strokeLinecap="round" transform="translate(5 7)" />
     </svg>
   );
 }

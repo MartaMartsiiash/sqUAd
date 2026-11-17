@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type GameMeta } from "../api/client";
 import { useAuth } from "../auth/auth";
-import { ChromeBlob, ChromeSquiggle, Logo, Num, Page, TubeScript } from "../components/ui";
+import { ChromeBlob, ChromeSquiggle, Logo, Num, Page, RedRibbon } from "../components/ui";
 
 const CODE_CHARS = /[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g;
 
@@ -32,12 +32,9 @@ export default function Home() {
             <span className="label">for your squad</span>
           </div>
           <h1 className="pop relative mt-6 w-fit">
-            <Logo className="block text-[18.5vw] leading-[0.9] sm:text-[8.5rem]" />
-            {/* "party" written over the wordmark like a glass tube */}
-            <TubeScript
-              text="party"
-              className="pointer-events-none absolute -bottom-[38%] right-[-8%] w-[62%] -rotate-[8deg]"
-            />
+            <Logo className="relative block text-[18.5vw] leading-[0.9] sm:text-[8.5rem]" />
+            {/* a glass-tube ribbon running through the wordmark */}
+            <RedRibbon className="pointer-events-none absolute -bottom-[30%] left-[-6%] w-[112%] -rotate-[4deg]" />
           </h1>
           <div className="mt-14 grid max-w-xl gap-4 sm:mt-16">
             <p className="relative max-w-md text-lg leading-snug">
