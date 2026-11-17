@@ -17,3 +17,5 @@ dist/
 *.tfstate
 *.tfstate.*
 .terraform.lock.hcl
+.env.production
+.env.local

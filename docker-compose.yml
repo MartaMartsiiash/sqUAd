@@ -1,0 +1,35 @@
+# Local run: `make dev`, then open http://localhost:5173
+# The backend keeps rooms in memory (STORAGE=memory) and accepts a fake host
+# sign-in (AUTH_DEV_MODE=true), so nothing on AWS is needed to try the games.
+services:
+  backend:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes: ["./backend:/app"]
+    command: >
+      sh -c "pip install -q fastapi 'uvicorn[standard]' pydantic-settings mangum 'pyjwt[crypto]' boto3 &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      STORAGE: memory
+      AUTH_DEV_MODE: "true"
+      CORS_ORIGINS: http://localhost:5173
+      MONO_WEBHOOK_SECRET: local-secret
+      MONO_JAR_URL: https://send.monobank.ua/jar/example
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 5s
+      retries: 20
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    volumes: ["./frontend:/app", "/app/node_modules"]
+    command: sh -c "npm ci && npx vite --host 0.0.0.0 --port 5173"
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_AUTH_DEV: "true"
+    ports: ["5173:5173"]
+    depends_on:
+      backend:
+        condition: service_healthy
