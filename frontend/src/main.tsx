@@ -9,6 +9,7 @@ import "@fontsource/unbounded/cyrillic-800.css";
 import "@fontsource/unbounded/latin-400.css";
 import "@fontsource/unbounded/latin-600.css";
 import "@fontsource/unbounded/latin-800.css";
+import "@fontsource/unbounded/latin-900.css";
 import "@fontsource/manrope/cyrillic-400.css";
 import "@fontsource/manrope/cyrillic-500.css";
 import "@fontsource/manrope/latin-500.css";

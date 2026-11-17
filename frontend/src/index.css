@@ -111,6 +111,18 @@ body::after {
   @apply w-full rounded-2xl border border-line bg-bg/70 px-4 py-3.5 text-lg text-fg outline-none transition placeholder:text-muted/70 focus:border-red;
 }
 
+/* "UA" in the wordmark: heavier, cherry glass with a highlight on top and depth below. */
+.ua-glossy {
+  font-weight: 900;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #f3a0ae 0%, #d02a4a 22%, #a10f2e 48%, #6d0619 72%, #3b020c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0.02em 0 #5c0515) drop-shadow(0 0.035em 0 #3a020c)
+    drop-shadow(0 0.09em 0.08em rgba(0, 0, 0, 0.55));
+}
+
 @keyframes pop {
   0% { transform: translateY(8px) scale(0.98); opacity: 0; }
   100% { transform: none; opacity: 1; }

@@ -4,10 +4,10 @@ import type { PlayerPublic } from "../api/client";
 import { useAuth } from "../auth/auth";
 
 /** The wordmark: "squad" with UA set apart in red. */
-export function Logo({ className = "text-xl" }: { className?: string }) {
+export function Logo({ className = "text-xl", glossy = false }: { className?: string; glossy?: boolean }) {
   return (
     <span className={`font-display font-extrabold lowercase tracking-tight ${className}`}>
-      sq<span className="text-red uppercase">UA</span>d
+      sq<span className={glossy ? "ua-glossy" : "text-red uppercase"}>UA</span>d
     </span>
   );
 }
@@ -205,29 +205,6 @@ export function ChromeBlob({ className = "" }: { className?: string }) {
         opacity="0.55"
         filter="url(#soft)"
       />
-    </svg>
-  );
-}
-
-/** A glossy cherry-red ribbon, like a tube of glass, laid across the wordmark. */
-export function RedRibbon({ className = "" }: { className?: string }) {
-  const d = "M6 150 C 90 40, 170 40, 230 120 S 370 210, 440 120 S 560 20, 640 80";
-  return (
-    <svg viewBox="0 0 650 230" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#d23a56" />
-          <stop offset="0.4" stopColor="#8f0b27" />
-          <stop offset="1" stopColor="#3d0410" />
-        </linearGradient>
-        <filter id="ribbonShadow" x="-10%" y="-20%" width="120%" height="160%">
-          <feDropShadow dx="0" dy="12" stdDeviation="10" floodColor="#000" floodOpacity="0.55" />
-        </filter>
-      </defs>
-      <path d={d} fill="none" stroke="#2b030a" strokeWidth="26" strokeLinecap="round" filter="url(#ribbonShadow)" />
-      <path d={d} fill="none" stroke="url(#ribbon)" strokeWidth="22" strokeLinecap="round" />
-      {/* the light running along the top of the tube */}
-      <path d={d} fill="none" stroke="#f3c9d1" strokeOpacity="0.6" strokeWidth="3" strokeLinecap="round" transform="translate(-2 -6)" />
     </svg>
   );
 }
