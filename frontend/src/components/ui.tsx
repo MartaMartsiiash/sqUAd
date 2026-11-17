@@ -20,7 +20,7 @@ export function ThemeToggle() {
   );
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#070707" : "#f1ede8");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#070707" : "#dedede");
     try {
       localStorage.setItem("squad:theme", theme);
     } catch {
@@ -172,8 +172,8 @@ export function ChromeBlob({ className = "" }: { className?: string }) {
           <stop offset="1" stopColor="#3a3a3a" />
         </linearGradient>
         <radialGradient id="redglint" cx="0.7" cy="0.75" r="0.45">
-          <stop offset="0" stopColor="#ff2b2b" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#ff2b2b" stopOpacity="0" />
+          <stop offset="0" stopColor="#d1102f" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#d1102f" stopOpacity="0" />
         </radialGradient>
         <radialGradient id="shine" cx="0.32" cy="0.25" r="0.3">
           <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
@@ -202,6 +202,60 @@ export function ChromeBlob({ className = "" }: { className?: string }) {
         opacity="0.55"
         filter="url(#soft)"
       />
+    </svg>
+  );
+}
+
+/** A word in red script that looks like a glossy tube of glass, as in the references. */
+export function TubeScript({ text, className = "" }: { text: string; className?: string }) {
+  return (
+    <svg viewBox="0 0 600 220" className={className} aria-hidden>
+      <defs>
+        <linearGradient id="tube" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ff6b7d" />
+          <stop offset="0.35" stopColor="#c80f2c" />
+          <stop offset="1" stopColor="#5a000f" />
+        </linearGradient>
+        <filter id="tubeShadow" x="-10%" y="-10%" width="120%" height="140%">
+          <feDropShadow dx="0" dy="10" stdDeviation="10" floodColor="#000" floodOpacity="0.55" />
+        </filter>
+      </defs>
+      <g fontFamily="Yellowtail, cursive" fontSize="190" textAnchor="middle" strokeLinejoin="round" strokeLinecap="round">
+        {/* body of the tube */}
+        <text x="300" y="165" fill="url(#tube)" stroke="#6b0013" strokeWidth="6" filter="url(#tubeShadow)">
+          {text}
+        </text>
+        {/* the light running along the top of the tube */}
+        <text x="297" y="160" fill="none" stroke="#ffd6dc" strokeOpacity="0.55" strokeWidth="2.2">
+          {text}
+        </text>
+      </g>
+    </svg>
+  );
+}
+
+/** A loop of liquid chrome, the small decorative element from the references. */
+export function ChromeSquiggle({ className = "" }: { className?: string }) {
+  const d = "M40 150 C 40 60, 150 40, 170 100 C 190 160, 110 190, 100 140 C 90 90, 200 60, 250 110 C 290 150, 260 200, 220 190";
+  return (
+    <svg viewBox="0 0 300 230" className={className} aria-hidden>
+      <defs>
+        <linearGradient id="sq-chrome" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fafafa" />
+          <stop offset="0.25" stopColor="#6d6d6d" />
+          <stop offset="0.45" stopColor="#f0f0f0" />
+          <stop offset="0.6" stopColor="#1c1c1c" />
+          <stop offset="0.8" stopColor="#d9d9d9" />
+          <stop offset="1" stopColor="#4a4a4a" />
+        </linearGradient>
+        <filter id="sq-shadow" x="-20%" y="-20%" width="140%" height="150%">
+          <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#000" floodOpacity="0.45" />
+        </filter>
+      </defs>
+      <path d={d} fill="none" stroke="#2a2a2a" strokeWidth="30" strokeLinecap="round" filter="url(#sq-shadow)" />
+      <path d={d} fill="none" stroke="url(#sq-chrome)" strokeWidth="26" strokeLinecap="round" />
+      <path d={d} fill="none" stroke="#ffffff" strokeOpacity="0.7" strokeWidth="4" strokeLinecap="round" transform="translate(-4 -6)" />
+      <path d={d} fill="none" stroke="#d1102f" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" transform="translate(5 7)" />
     </svg>
   );
 }

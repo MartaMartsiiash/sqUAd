@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type GameMeta } from "../api/client";
 import { useAuth } from "../auth/auth";
-import { ChromeBlob, Logo, Num, Page } from "../components/ui";
+import { ChromeBlob, ChromeSquiggle, Logo, Num, Page, TubeScript } from "../components/ui";
 
 const CODE_CHARS = /[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g;
 
@@ -31,10 +31,15 @@ export default function Home() {
             <span className="label">party games</span>
             <span className="label">for your squad</span>
           </div>
-          <h1 className="pop mt-6">
+          <h1 className="pop relative mt-6 w-fit">
             <Logo className="block text-[18.5vw] leading-[0.9] sm:text-[8.5rem]" />
+            {/* "party" written over the wordmark like a glass tube */}
+            <TubeScript
+              text="party"
+              className="pointer-events-none absolute -bottom-[38%] right-[-8%] w-[62%] -rotate-[8deg]"
+            />
           </h1>
-          <div className="mt-6 grid max-w-xl gap-4">
+          <div className="mt-14 grid max-w-xl gap-4 sm:mt-16">
             <p className="relative max-w-md text-lg leading-snug">
               Ігри для компанії, яка зібралася разом. Один створює кімнату, решта заходить за кодом
               зі своїх телефонів.
@@ -84,7 +89,8 @@ export default function Home() {
       </section>
 
       {games.length > 0 && (
-        <section className="mt-14">
+        <section className="relative mt-14">
+          <ChromeSquiggle className="pointer-events-none absolute -top-14 right-2 w-28 -rotate-12 sm:-top-20 sm:w-40" />
           <div className="flex items-end justify-between border-b border-line pb-3">
             <h2 className="display text-3xl sm:text-5xl">Ігри</h2>
             <span className="label">{games.length} на вечір</span>

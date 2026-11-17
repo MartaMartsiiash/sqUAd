@@ -2,7 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, ApiError, session, type GameMeta, type RoomView } from "../api/client";
-import { Avatar, ErrorNote, Num, Page, PlayerChip, Waiting } from "../components/ui";
+import { Avatar, ChromeSquiggle, ErrorNote, Num, Page, PlayerChip, Waiting } from "../components/ui";
 import Associations from "../games/Associations";
 import { GamePoints } from "../games/common";
 import ForgottenWords from "../games/ForgottenWords";
@@ -229,7 +229,8 @@ function Lobby({ room, token, isHost, run }: {
 
   return (
     <div className="space-y-4">
-      <div className="card pop text-center">
+      <div className="card pop relative overflow-hidden text-center">
+        <ChromeSquiggle className="pointer-events-none absolute -right-3 -top-3 w-28 rotate-12" />
         {showQr && (
           <div className="mx-auto w-fit rounded-[20px] bg-white p-4">
             <QRCodeSVG value={joinUrl} size={196} fgColor="#0a0a0a" />
@@ -375,6 +376,7 @@ function Scoreboard({ room, byId }: { room: RoomView; byId: GameProps["byId"] })
       {leader && (
         <div className="pop card relative overflow-hidden border-red/50 text-center">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,var(--glow),transparent_70%)]" />
+          <ChromeSquiggle className="pointer-events-none absolute -left-6 -top-4 w-24 -rotate-12" />
           <div className="relative">
             <span className="label">MVP вечора</span>
             <div className="mt-4 flex justify-center">

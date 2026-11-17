@@ -9,26 +9,26 @@
   --line: #2a2a2a;
   --fg: #f4f1ee;
   --muted: #8d8783;
-  --red: #ff2b2b;
-  --red-deep: #8f000f;
-  --on-red: #0a0a0a;
-  --glow: rgba(255, 43, 43, 0.28);
-  --glow-2: rgba(143, 0, 15, 0.45);
+  --red: #d1102f;
+  --red-deep: #6b0013;
+  --on-red: #ffffff;
+  --glow: rgba(209, 16, 47, 0.3);
+  --glow-2: rgba(107, 0, 19, 0.5);
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --bg: #f1ede8;
-  --surface: #fbf9f7;
-  --surface-2: #ece6e0;
-  --line: #d9d1c9;
-  --fg: #0d0d0d;
-  --muted: #6f6762;
-  --red: #e10600;
-  --red-deep: #8f000f;
+  --bg: #dedede;
+  --surface: #ededed;
+  --surface-2: #d2d2d2;
+  --line: #c2c2c2;
+  --fg: #0b0b0b;
+  --muted: #5e5e5e;
+  --red: #b3001f;
+  --red-deep: #6b0013;
   --on-red: #ffffff;
-  --glow: rgba(225, 6, 0, 0.16);
-  --glow-2: rgba(225, 6, 0, 0.08);
+  --glow: rgba(179, 0, 31, 0.14);
+  --glow-2: rgba(80, 80, 80, 0.12);
   color-scheme: light;
 }
 
@@ -45,6 +45,7 @@
   --font-display: "Unbounded", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-script: "Yellowtail", cursive;
 }
 
 html,
@@ -62,6 +63,7 @@ body {
   background-attachment: fixed;
   color: var(--fg);
   font-family: var(--font-sans);
+  font-weight: 500;
   -webkit-tap-highlight-color: transparent;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -79,14 +81,16 @@ body::after {
 
 @utility label {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 @utility display {
   font-family: var(--font-display);
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.02em;
   line-height: 0.95;
