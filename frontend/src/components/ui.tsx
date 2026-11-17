@@ -7,7 +7,8 @@ import { useAuth } from "../auth/auth";
 export function Logo({ className = "text-xl", glossy = false }: { className?: string; glossy?: boolean }) {
   return (
     <span className={`font-display font-extrabold lowercase tracking-tight ${className}`}>
-      sq<span className={glossy ? "ua-glossy" : "text-red uppercase"}>UA</span>d
+      sq{glossy ? <ScriptUA /> : <span className="text-red uppercase">UA</span>}
+      <span className="relative z-0">d</span>
     </span>
   );
 }
@@ -205,6 +206,49 @@ export function ChromeBlob({ className = "" }: { className?: string }) {
         opacity="0.55"
         filter="url(#soft)"
       />
+    </svg>
+  );
+}
+
+/**
+ * "UA" in a cherry-red script that looks like a thick tube of glass: a dark
+ * outline and shadow underneath, the gradient body, and a thin light line on top.
+ */
+export function ScriptUA() {
+  const text = (
+    <text x="14" y="168" fontFamily="Yellowtail, cursive" fontSize="200" style={{ textTransform: "none" }}>
+      UA
+    </text>
+  );
+  return (
+    <svg
+      viewBox="0 0 285 215"
+      className="relative z-10 -ml-[0.08em] -mr-[0.14em] inline-block h-[1.3em] w-auto -translate-y-[0.08em] -rotate-[6deg] align-middle"
+      role="img"
+      aria-label="UA"
+      overflow="visible"
+    >
+      <defs>
+        <linearGradient id="ua-body" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c8304d" />
+          <stop offset="0.4" stopColor="#9c0f2c" />
+          <stop offset="0.75" stopColor="#6a061a" />
+          <stop offset="1" stopColor="#3d030d" />
+        </linearGradient>
+        <filter id="ua-soft">
+          <feGaussianBlur stdDeviation="1.1" />
+        </filter>
+        <filter id="ua-shadow" x="-20%" y="-20%" width="140%" height="160%">
+          <feDropShadow dx="0" dy="9" stdDeviation="7" floodColor="#000" floodOpacity="0.6" />
+        </filter>
+      </defs>
+      <g strokeLinejoin="round" strokeLinecap="round">
+        <g fill="#3a020c" stroke="#3a020c" strokeWidth="16" filter="url(#ua-shadow)">{text}</g>
+        <g fill="url(#ua-body)" stroke="url(#ua-body)" strokeWidth="11">{text}</g>
+        <g fill="none" stroke="#ffd6dd" strokeOpacity="0.5" strokeWidth="3" filter="url(#ua-soft)" transform="translate(-1.5 -3)">
+          {text}
+        </g>
+      </g>
     </svg>
   );
 }
