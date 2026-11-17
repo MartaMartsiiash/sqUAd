@@ -24,7 +24,7 @@ class Clock:
 
 @pytest.fixture
 def settings():
-    return Settings(storage="memory", auth_dev_mode=True, mono_webhook_secret="s3cret", premium_price_uah=20)
+    return Settings(storage="memory", auth_dev_mode=True, mono_webhook_secret="s3cret", premium_price_uah=50)
 
 
 @pytest.fixture

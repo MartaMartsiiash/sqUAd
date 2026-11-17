@@ -1,4 +1,4 @@
-"""Забуті слова (premium): old and regional Ukrainian words, and a bluffing game.
+"""Забуті слова: old and regional Ukrainian words, and a bluffing game.
 
 Everyone sees a forgotten word and writes a believable fake meaning. Then all
 the meanings, the real one among them, are shown and everyone votes for the
@@ -34,7 +34,6 @@ class ForgottenWords(Game):
         "яке справжнє. Вгадав — 2 бали. За кожного, хто повірив твоїй вигадці, — 1 бал."
     )
     min_players = 3
-    premium = True
 
     def start(self, players, settings, rng, now):
         ids = [p["id"] for p in players]

@@ -15,8 +15,9 @@ room* and gets a five-character code such as `K7Q2M` (and a QR code). Every
 **player** opens the site on their own phone, types the code and a name, and
 lands in the **lobby** without an account. The host picks a game from the
 list, everyone plays on their own phone, and the points go to one **scoreboard**
-that lives for the whole evening. Premium games are unlocked for the room by a
-donation to the host's monobank jar with the room code in the comment.
+that lives for the whole evening. The first two games in a room are free; a donation to
+the host's monobank jar with the room code in the comment unlocks unlimited
+games for that room.
 
 ### Who uses it
 
@@ -24,7 +25,7 @@ donation to the host's monobank jar with the room code in the comment.
 |---|---|---|
 | Host | Yes (email + password, or Google) | create a room, start and stop games, kick a player |
 | Player | No: a name and the room code | join, play, see the scoreboard |
-| Donor | No | unlock premium games for a room with a donation |
+| Donor | No | unlock unlimited games for a room with a donation |
 
 ## 2. Repository layout
 
@@ -105,7 +106,8 @@ tested without either.
 
 - **Room**: `code` (5 characters from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`,
   no `0/O` or `1/I` to avoid confusion), `host_id`, `players`, `scoreboard`,
-  `current_game` (or none), `premium` (bool), `version` (int), `created_at`,
+  `current_game` (or none), `games_started`, `premium` (bool: unlimited games
+  after a donation), `version` (int), `created_at`,
   `expires_at` (24 hours later; DynamoDB deletes the room by TTL).
 - **Player**: `id`, `name`, `emoji`, `color`, `token` (secret, known only to
   that phone), `last_seen`. A player who reloads the page or loses the
@@ -125,7 +127,6 @@ class Game:
     title: str              # "Шпигун"
     description: str        # one line for the lobby
     min_players: int
-    premium: bool           # True: locked until the room is unlocked
 
     def start(self, players, settings, rng) -> state
     def act(self, state, player_id, action, now) -> state      # a player did something
@@ -152,7 +153,7 @@ All paths start with `/api`. Errors share one shape:
 | Method and path | Who | What |
 |---|---|---|
 | `GET /health` | anyone | `{"status": "ok"}` |
-| `GET /games` | anyone | the list of games with `premium` flags |
+| `GET /games` | anyone | the list of games |
 | `POST /rooms` | host (Cognito token) | create a room, returns `{code, host_player}` |
 | `POST /rooms/{code}/join` | anyone | body `{name, emoji}`; returns `{player_id, token}` |
 | `GET /rooms/{code}` | player (`X-Player-Token`) | the room as this player may see it: players, scoreboard, current game view, `version` |
@@ -172,8 +173,8 @@ times). No locks, no lost updates.
 
 ## 7. Payments: how a donation is tracked
 
-1. The room screen shows *Unlock premium* with a link to the host's monobank
-   jar and the room code to put in the comment.
+1. The lobby shows how many free games are left and, next to it, the host's
+   monobank jar link and the room code to put in the comment.
 2. monobank sends every new transaction on the owner's accounts and jars to
    `POST /api/payments/monobank/{secret}` (the webhook is registered once with
    `make mono-webhook`).
@@ -181,8 +182,8 @@ times). No locks, no lost updates.
    `PREMIUM_PRICE_UAH`, finds a room code in the comment, and stores the
    payment as its own item (`PAY#<transaction id>`), so the same webhook
    delivered twice is counted once.
-4. The room gets `premium = true`; every phone sees the premium games unlocked
-   on its next poll.
+4. The room gets `premium = true` (unlimited games); every phone sees it on
+   its next poll.
 
 The monobank token lives only on the owner's laptop (to register the webhook)
 and is never committed. The `{secret}` path part stops strangers from calling
@@ -212,7 +213,8 @@ written as one item: one read per poll, one conditional write per action.
 | `CORS_ORIGINS` | backend | the site's URL |
 | `MONO_WEBHOOK_SECRET` | backend | the secret path part of the webhook |
 | `MONO_JAR_URL` | backend, frontend | the jar link shown to donors |
-| `PREMIUM_PRICE_UAH` | backend | minimum donation that unlocks a room |
+| `PREMIUM_PRICE_UAH` | backend | minimum donation that unlocks a room (50) |
+| `FREE_GAMES` | backend | games a room plays before it needs a donation (2) |
 | `VITE_API_URL`, `VITE_COGNITO_*` | frontend | baked into the build |
 
 ## 10. Commands (Makefile)

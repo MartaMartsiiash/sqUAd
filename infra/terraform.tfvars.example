@@ -7,4 +7,4 @@ google_client_id = ""
 # google_client_secret: export TF_VAR_google_client_secret=... in the terminal, never write it here.
 
 mono_jar_url      = "https://send.monobank.ua/jar/XXXXXXXX"
-premium_price_uah = 20
+premium_price_uah = 50

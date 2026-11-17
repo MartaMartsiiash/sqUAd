@@ -99,7 +99,6 @@ export default function Home() {
                   <p className="text-sm text-muted">{g.description}</p>
                 </div>
                 <span className="label col-start-2 sm:col-start-3 sm:self-center">
-                  {g.premium ? <span className="text-red">premium · </span> : null}
                   {g.tag}
                 </span>
               </li>

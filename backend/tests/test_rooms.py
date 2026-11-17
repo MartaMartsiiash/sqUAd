@@ -61,12 +61,22 @@ def test_only_host_starts_games_and_kicks(client, room_with_players):
     assert client.get(f"/api/rooms/{code}", headers=H(t["Іра"])).status_code == 403
 
 
-def test_premium_game_is_locked_until_paid(client, room_with_players):
+def test_two_free_games_then_locked_until_paid(client, room_with_players, rooms):
     code, t = room_with_players
-    r = client.post(f"/api/rooms/{code}/games", json={"game_id": "who_am_i"}, headers=H(t["Марта"]))
+    for game_id in ["who_of_us", "who_of_us"]:  # playing the same game again counts too
+        r = client.post(f"/api/rooms/{code}/games", json={"game_id": game_id}, headers=H(t["Марта"]))
+        assert r.status_code == 200
+        client.post(f"/api/rooms/{code}/games/stop", headers=H(t["Марта"]))
+    view = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()
+    assert view["free_left"] == 0 and all(g["locked"] for g in view["games"])
+    r = client.post(f"/api/rooms/{code}/games", json={"game_id": "spy"}, headers=H(t["Марта"]))
     assert r.status_code == 402
-    games = client.get(f"/api/rooms/{code}", headers=H(t["Марта"])).json()["games"]
-    assert {g["id"]: g["locked"] for g in games}["who_am_i"] is True
+    rooms.unlock_premium(code)
+    view = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()
+    assert view["free_left"] is None and not any(g["locked"] for g in view["games"])
+    for _ in range(3):
+        r = client.post(f"/api/rooms/{code}/games", json={"game_id": "spy"}, headers=H(t["Марта"]))
+        assert r.status_code == 200
 
 
 def test_reconnect_with_the_same_token(client, room_with_players):

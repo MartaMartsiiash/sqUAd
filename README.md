@@ -4,8 +4,9 @@
 Ukrainian. The host creates a room and gets a five-character code (and a QR
 code). Everyone opens the site on their own phone, types the code and a name,
 and plays: "Who of us…?", "Ні так, ні ні" (no yes, no no), Spy, Associations, Two
-truths and a lie, and premium games unlocked by a donation, such as "Забуті слова",
-a bluffing game with forgotten Ukrainian words. One scoreboard follows the group all evening.
+truths and a lie, "Забуті слова" (a bluffing game with forgotten Ukrainian words)
+and more. The first two games in a room are free; a 50 UAH donation unlocks the
+rest of the evening. One scoreboard follows the group all evening.
 
 > The name is *squad* with **UA** inside: games for your squad, in Ukrainian.
 
@@ -76,7 +77,7 @@ output to the client's authorized redirect URIs in Google Cloud Console.
 **Payments:** after the first deploy, run `make mono-webhook` once and paste
 your monobank personal token from https://api.monobank.ua (it is used for one
 request and not stored). From then on every donation to the jar with a room code
-in the comment unlocks premium games for that room. `make payments` lists every
+in the comment unlocks unlimited games for that room. `make payments` lists every
 tracked donation.
 
 To remove everything: `make destroy`.

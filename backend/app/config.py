@@ -26,7 +26,9 @@ class Settings(BaseSettings):
     # Payments (monobank personal API webhook).
     mono_webhook_secret: str = "change-me"
     mono_jar_url: str = ""
-    premium_price_uah: int = 20
+    premium_price_uah: int = 50
+    # Every room plays this many games for free; after that a donation unlocks the rest.
+    free_games: int = 2
 
     room_ttl_hours: int = 24
 

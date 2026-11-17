@@ -19,8 +19,22 @@ MAX_NAME_LENGTH = 20
 
 EMOJIS = ["🦊", "🐸", "🐼", "🦄", "🐙", "🐝", "🦉", "🐯", "🐨", "🐵", "🐧", "🐢", "🦖", "🐳", "🦋", "🐞"]
 COLORS = [
-    "#d1102f", "#f2f2f2", "#e05a6f", "#9a9a9a", "#ff7d8e", "#c9c9c9", "#a3001b", "#7a7a7a",
-    "#f4b6bf", "#bfbfbf", "#e8325a", "#dcdcdc", "#c2185b", "#adadad", "#ff4f6a", "#e6e6e6",
+    "#d1102f",
+    "#f2f2f2",
+    "#e05a6f",
+    "#9a9a9a",
+    "#ff7d8e",
+    "#c9c9c9",
+    "#a3001b",
+    "#7a7a7a",
+    "#f4b6bf",
+    "#bfbfbf",
+    "#e8325a",
+    "#dcdcdc",
+    "#c2185b",
+    "#adadad",
+    "#ff4f6a",
+    "#e6e6e6",
 ]
 
 
@@ -77,7 +91,8 @@ class Room:
     history: list[dict[str, Any]] = field(default_factory=list)  # finished games
     game_id: str | None = None
     game_state: dict[str, Any] | None = None
-    premium: bool = False
+    premium: bool = False  # unlimited games, after a donation
+    games_started: int = 0
     version: int = 0
 
     # ----- players -------------------------------------------------------

@@ -18,7 +18,6 @@ export type GameMeta = {
   rules: string;
   tag: string;
   min_players: number;
-  premium: boolean;
   locked: boolean;
 };
 
@@ -36,6 +35,9 @@ export type RoomView = {
   leaderboard: { player_id: string; points: number }[];
   history: { game_id: string; title: string; points: Record<string, number>; at: number }[];
   premium: boolean;
+  free_games: number;
+  /** free games left in this room; null once a donation unlocked unlimited games */
+  free_left: number | null;
   premium_price_uah: number;
   jar_url: string;
   games: GameMeta[];

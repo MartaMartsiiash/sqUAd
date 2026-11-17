@@ -1,4 +1,4 @@
-"""PaymentService: track monobank donations and unlock premium games.
+"""PaymentService: track monobank donations and unlock unlimited games for a room.
 
 monobank's personal API sends every new transaction on the owner's cards and
 jars to our webhook (PROJECT.md, section 7). The body looks like:

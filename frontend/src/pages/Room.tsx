@@ -292,7 +292,18 @@ function Lobby({ room, token, isHost, run }: {
       </div>
 
       <div className="card">
-        <h2 className="label mb-2">{isHost ? "Обери гру" : "Ігри вечора"}</h2>
+        <div className="mb-2 flex items-baseline justify-between gap-3">
+          <h2 className="label">{isHost ? "Обери гру" : "Ігри вечора"}</h2>
+          <span className="label text-right">
+            {room.free_left === null ? (
+              <span className="text-red">безліміт</span>
+            ) : (
+              <>
+                безкоштовно: <span className="text-red">{room.free_left}</span> / {room.free_games}
+              </>
+            )}
+          </span>
+        </div>
         <ol className="divide-y divide-line">
           {room.games.map((g, i) => (
             <GameRow
@@ -322,14 +333,11 @@ function GameRow({ n, g, isHost, enough, onStart }: {
       <div className="min-w-0 flex-1">
         <p className="font-display font-semibold uppercase">{g.title}</p>
         <p className="text-sm text-muted">{g.description}</p>
-        <p className="label mt-1">
-          {g.premium && <span className="text-red">premium · </span>}
-          {g.tag}
-        </p>
+        <p className="label mt-1">{g.tag}</p>
       </div>
       {isHost &&
         (g.locked ? (
-          <span className="label shrink-0">закрито</span>
+          <span className="label shrink-0">донат</span>
         ) : (
           <button
             className="btn-primary shrink-0 px-4 py-2.5 text-xs"
@@ -348,11 +356,15 @@ function Premium({ room }: { room: RoomView }) {
   const [copied, setCopied] = useState(false);
   return (
     <div className="card border-red/40 bg-gradient-to-br from-red/15 via-surface/90 to-surface/90">
-      <span className="label text-red">premium</span>
-      <h2 className="display mt-2 text-2xl">Відкрийте ще 3 ігри</h2>
+      <span className="label text-red">безліміт</span>
+      <h2 className="display mt-2 text-2xl">
+        {room.free_left === 0 ? "Безкоштовні ігри закінчились" : "Хочеться грати далі?"}
+      </h2>
       <p className="mt-2 text-sm text-muted">
-        Задонать від <b className="text-fg">{room.premium_price_uah} грн</b> на банку й напиши в коментарі код
-        кімнати. Ігри відкриються для всіх у кімнаті автоматично, за кілька секунд.
+        Перші {room.free_games} ігри в кімнаті безкоштовні. Донат від{" "}
+        <b className="text-fg">{room.premium_price_uah} грн</b> на банку відкриває всі ігри й повтори до кінця
+        вечора. Напиши в коментарі до донату код кімнати, і все відкриється для всіх автоматично, за кілька
+        секунд.
       </p>
       <button
         className="mt-4 w-full rounded-2xl border border-dashed border-red/60 py-3 font-mono text-2xl font-semibold tracking-[0.3em] text-red"

@@ -69,6 +69,12 @@ class RoomService:
                 room.award(game.id, game.title, points, now)
                 room.game_state["_awarded"] = True
 
+    def _free_left(self, room: Room) -> int | None:
+        """Free games left in this room, or None when the room has unlimited games."""
+        if room.premium:
+            return None
+        return max(0, self.settings.free_games - room.games_started)
+
     def _require_host(self, room: Room, token: str | None) -> None:
         if not room.player_by_token(token).is_host:
             raise DomainError("host_only", "Це може зробити лише ведучий", 403)
@@ -122,13 +128,19 @@ class RoomService:
 
         def change(room: Room):
             self._require_host(room, token)
-            if game.premium and not room.premium:
-                raise DomainError("premium_locked", "Ця гра відкривається донатом", 402)
+            if self._free_left(room) == 0:
+                raise DomainError(
+                    "premium_locked",
+                    f"Безкоштовні ігри закінчились. Донат від {self.settings.premium_price_uah} грн "
+                    "відкриває безліміт",
+                    402,
+                )
             if len(room.players) < game.min_players:
                 raise DomainError(
                     "not_enough_players", f"Для цієї гри потрібно щонайменше {game.min_players} гравці"
                 )
             players = [{"id": p.id, "name": p.name} for p in room.players]
+            room.games_started += 1
             room.game_id = game.id
             room.game_state = game.start(players, settings or {}, self.rng, self.clock())
 
@@ -195,7 +207,8 @@ class RoomService:
                 if me_id in state.get("player_ids", [])
                 else {"phase": state.get("phase"), "spectator": True},
             }
-        games = [{**meta, "locked": meta["premium"] and not room.premium} for meta in all_games()]
+        free_left = self._free_left(room)
+        games = [{**meta, "locked": free_left == 0} for meta in all_games()]
         return {
             "code": room.code,
             "version": room.version,
@@ -206,6 +219,8 @@ class RoomService:
             "leaderboard": room.leaderboard(),
             "history": room.history,
             "premium": room.premium,
+            "free_games": self.settings.free_games,
+            "free_left": free_left,
             "premium_price_uah": self.settings.premium_price_uah,
             "jar_url": self.settings.mono_jar_url,
             "games": games,

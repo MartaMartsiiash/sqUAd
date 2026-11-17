@@ -34,15 +34,14 @@ def test_donation_unlocks_premium_once(client, room_with_players):
     assert webhook(client, item).json()["status"] == "duplicate"
     view = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()
     assert view["premium"] is True
-    r = client.post(f"/api/rooms/{code}/games", json={"game_id": "who_am_i"}, headers=H(t["Марта"]))
-    assert r.status_code == 200
+    assert view["free_left"] is None
     summary = client.get("/api/payments/monobank/s3cret/summary").json()
     assert summary["count"] == 1 and summary["total_uah"] == 50
 
 
 def test_too_small_or_outgoing_does_not_unlock(client, room_with_players):
     code, _ = room_with_players
-    assert webhook(client, {"id": "a", "amount": 500, "comment": code}).json()["unlocked"] is False
+    assert webhook(client, {"id": "a", "amount": 4900, "comment": code}).json()["unlocked"] is False
     assert webhook(client, {"id": "b", "amount": -9000, "comment": code}).json()["status"] == "ignored"
 
 

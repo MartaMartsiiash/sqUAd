@@ -1,4 +1,4 @@
-"""Квіз про друзів (premium): how well do you know your friends?
+"""Квіз про друзів: how well do you know your friends?
 
 Each round one player is the subject. The subject secretly picks one of two
 options ("Море чи гори?"); everyone else guesses what they picked.
@@ -26,7 +26,6 @@ class FriendsQuiz(Game):
         "якщо його вибір вгадала хоча б половина компанії."
     )
     min_players = 3
-    premium = True
 
     def start(self, players, settings, rng, now):
         ids = [p["id"] for p in players]

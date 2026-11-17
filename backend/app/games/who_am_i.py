@@ -1,4 +1,4 @@
-"""Хто я? (premium): you see everyone's character except your own.
+"""Хто я?: you see everyone's character except your own.
 
 Phases: play -> finished. Players ask yes/no questions out loud and press
 "I guessed it" (the others confirm out loud). Earlier guesses score more.
@@ -24,7 +24,6 @@ class WhoAmI(Game):
         "«Я вгадав(ла)!». Хто раніше вгадав, той більше балів отримав."
     )
     min_players = 3
-    premium = True
 
     def start(self, players, settings, rng, now):
         ids = [p["id"] for p in players]

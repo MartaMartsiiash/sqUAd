@@ -31,8 +31,8 @@ variable "mono_jar_url" {
 
 variable "premium_price_uah" {
   type        = number
-  default     = 20
-  description = "Smallest donation that unlocks premium games for a room."
+  default     = 50
+  description = "Smallest donation that unlocks unlimited games for a room (after the free ones)."
 }
 
 variable "local_dev_urls" {

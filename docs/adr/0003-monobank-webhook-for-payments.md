@@ -8,9 +8,10 @@ the payments. Card acquiring (LiqPay, WayForPay, monobank acquiring) needs a
 registered business (ФОП). Stripe test mode takes no real money.
 
 ## Decision
-Base games are free; premium games unlock for a room after a donation of at
-least `PREMIUM_PRICE_UAH` to the owner's monobank jar with the room code in the
-comment. monobank's personal API calls our webhook for every transaction; the
+Every room plays `FREE_GAMES` (2) games for free; a repeat of the same game
+counts as a new one. After that, a donation of at least `PREMIUM_PRICE_UAH`
+(50 UAH) to the owner's monobank jar, with the room code in the comment, unlocks
+unlimited games for that room until it closes. monobank's personal API calls our webhook for every transaction; the
 backend finds the room code, stores the payment once (by its monobank id) and
 unlocks the room.
 

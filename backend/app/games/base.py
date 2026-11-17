@@ -25,7 +25,6 @@ class Game(ABC):
     rules: str = ""
     tag: str = ""
     min_players: int = 3
-    premium: bool = False
 
     def meta(self) -> dict[str, Any]:
         return {
@@ -35,7 +34,6 @@ class Game(ABC):
             "rules": self.rules,
             "tag": self.tag,
             "min_players": self.min_players,
-            "premium": self.premium,
         }
 
     @abstractmethod
