@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { PlayerPublic } from "../api/client";
 import { useAuth } from "../auth/auth";
+import { TUBE_GLYPHS } from "./tubeGlyphs";
 
 /** The wordmark from the brand artwork: a dark and a light version, switched by the theme. */
 export function Logo({ className = "h-8" }: { className?: string; glossy?: boolean }) {
@@ -173,44 +174,43 @@ export function Glare({ className = "" }: { className?: string }) {
 }
 
 /**
- * Text drawn as glossy cherry-red tubes, like the room-code artwork: a rounded
- * thin font, stroked thick in layers (dark edge, body, soft light on top).
+ * The room code drawn as inflated glossy cherry-red tubes, like the room-code
+ * artwork: every letter is a single-stroke path (tubeGlyphs.ts) stroked in
+ * layers: a dark edge with a glow, the red body, a lighter core and a soft
+ * white highlight along the top of the tube.
  */
 export function TubeText({ text, className = "" }: { text: string; className?: string }) {
-  const w = Math.max(1, text.length) * 118 + 40;
-  const glyphs = (
-    <text
-      x={w / 2}
-      y="132"
-      textAnchor="middle"
-      fontFamily="Quicksand, ui-rounded, sans-serif"
-      fontWeight="300"
-      fontSize="150"
-      letterSpacing="18"
-    >
-      {text}
-    </text>
+  const chars = Array.from(text.toUpperCase());
+  const step = 132;
+  const w = chars.length * step + 44;
+  const all = chars.map((ch, i) =>
+    TUBE_GLYPHS[ch] ? <path key={i} d={TUBE_GLYPHS[ch]} transform={`translate(${22 + i * step} 22)`} /> : null,
   );
   return (
-    <svg viewBox={`0 0 ${w} 180`} className={className} role="img" aria-label={text}>
+    <svg viewBox={`0 0 ${w} 190`} className={className} role="img" aria-label={text}>
       <defs>
-        <linearGradient id="tube-body" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#d6405b" />
-          <stop offset="0.45" stopColor="#a10f2c" />
-          <stop offset="1" stopColor="#4d0412" />
-        </linearGradient>
-        <filter id="tube-blur">
-          <feGaussianBlur stdDeviation="1.6" />
-        </filter>
         <filter id="tube-glow" x="-10%" y="-20%" width="120%" height="150%">
-          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#a10f2c" floodOpacity="0.45" />
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#b3132f" floodOpacity="0.5" />
+        </filter>
+        <filter id="tube-soft">
+          <feGaussianBlur stdDeviation="2.2" />
+        </filter>
+        <filter id="tube-sharp">
+          <feGaussianBlur stdDeviation="0.8" />
         </filter>
       </defs>
-      <g strokeLinejoin="round" strokeLinecap="round" style={{ textTransform: "none" }}>
-        <g fill="#3d020c" stroke="#3d020c" strokeWidth="26" filter="url(#tube-glow)">{glyphs}</g>
-        <g fill="url(#tube-body)" stroke="url(#tube-body)" strokeWidth="21">{glyphs}</g>
-        <g fill="#ffd2da" stroke="#ffd2da" fillOpacity="0.5" strokeOpacity="0.35" strokeWidth="2" filter="url(#tube-blur)" transform="translate(-3 -6)">
-          {glyphs}
+      <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <g stroke="#2a0208" strokeWidth="40" filter="url(#tube-glow)">{all}</g>
+        <g stroke="#5e0618" strokeWidth="35">{all}</g>
+        <g stroke="#9d0f2b" strokeWidth="31" transform="translate(-1.5 -2.5)">{all}</g>
+        <g stroke="#c9213f" strokeWidth="20" strokeOpacity="0.9" filter="url(#tube-soft)" transform="translate(-3 -5)">
+          {all}
+        </g>
+        <g stroke="#f07d92" strokeWidth="8" strokeOpacity="0.75" filter="url(#tube-soft)" transform="translate(-5 -8)">
+          {all}
+        </g>
+        <g stroke="#fff2f4" strokeWidth="3" strokeOpacity="0.95" filter="url(#tube-sharp)" transform="translate(-6 -9)">
+          {all}
         </g>
       </g>
     </svg>
