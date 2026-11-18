@@ -316,6 +316,12 @@ function Lobby({ room, token, isHost, run }: {
             />
           ))}
         </ol>
+        {isHost && room.players.length < 3 && (
+          <p className="mt-3 rounded-2xl border border-line bg-bg/40 px-4 py-3 text-sm text-muted">
+            Для ігор потрібно щонайменше 3 гравці. Зараз у кімнаті {room.players.length}: покажіть друзям QR-код
+            або для перевірки відкрийте посилання кімнати в іншому браузері чи на телефоні.
+          </p>
+        )}
         {!isHost && <p className="label mt-3 text-center">Гру запускає ведучий</p>}
       </div>
 
@@ -339,14 +345,13 @@ function GameRow({ n, g, isHost, enough, onStart }: {
         (g.locked ? (
           <span className="label shrink-0">донат</span>
         ) : (
-          <button
-            className="btn-primary shrink-0 px-4 py-2.5 text-xs"
-            disabled={!enough}
-            onClick={onStart}
-            title={enough ? "" : `Потрібно ${g.min_players}+ гравців`}
-          >
-            Грати
-          </button>
+          enough ? (
+            <button className="btn-primary shrink-0 px-4 py-2.5 text-xs" onClick={onStart}>
+              Грати
+            </button>
+          ) : (
+            <span className="label shrink-0 text-right">від {g.min_players} гравців</span>
+          )
         ))}
     </li>
   );
