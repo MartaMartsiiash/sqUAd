@@ -96,3 +96,12 @@ locals {
 
   site_urls = distinct(concat([local.site_url, local.cloudfront_url], local.domain_urls, var.local_dev_urls))
 }
+
+# Dress the hosted sign-in page in the site's colours and logo (classic hosted UI
+# allows a CSS file with a fixed set of classes plus one logo, PNG/JPG up to 100 KB).
+resource "aws_cognito_user_pool_ui_customization" "web" {
+  user_pool_id = aws_cognito_user_pool_domain.main.user_pool_id
+  client_id    = aws_cognito_user_pool_client.web.id
+  css          = file("${path.module}/assets/cognito.css")
+  image_file   = filebase64("${path.module}/assets/cognito-logo.png")
+}
