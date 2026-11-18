@@ -20,6 +20,8 @@ provider "aws" {
 locals {
   has_domain    = var.domain_name != ""
   domain_active = local.has_domain && var.attach_domain
+  acm_options   = local.has_domain ? aws_acm_certificate.site[0].domain_validation_options : []
+  acm_records   = [for o in local.acm_options : "${o.resource_record_name} CNAME ${o.resource_record_value}"]
 }
 
 resource "aws_acm_certificate" "site" {
