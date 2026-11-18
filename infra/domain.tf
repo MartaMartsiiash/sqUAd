@@ -28,8 +28,8 @@ locals {
 }
 
 resource "aws_acm_certificate" "site" {
-  count             = local.has_domain ? 1 : 0
-  provider          = aws.us_east_1
+  count                     = local.has_domain ? 1 : 0
+  provider                  = aws.us_east_1
   domain_name               = var.domain_name
   subject_alternative_names = var.extra_domains
   validation_method         = "DNS"
