@@ -27,6 +27,7 @@ import AuthCallback from "./pages/AuthCallback";
 import Home from "./pages/Home";
 import Host from "./pages/Host";
 import Join from "./pages/Join";
+import Privacy from "./pages/Privacy";
 import Room from "./pages/Room";
 
 createRoot(document.getElementById("root")!).render(
@@ -38,6 +39,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/host" element={<Host />} />
           <Route path="/join/:code" element={<Join />} />
           <Route path="/room/:code" element={<Room />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="*" element={<Home />} />
         </Routes>

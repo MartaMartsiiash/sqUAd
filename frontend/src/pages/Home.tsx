@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api, type GameMeta } from "../api/client";
 import { useAuth } from "../auth/auth";
 import { Blob, Glare, Logo, Num, Page } from "../components/ui";
@@ -111,7 +111,12 @@ export default function Home() {
 
       <footer className="mt-16 flex flex-wrap justify-between gap-2 border-t border-line pt-4">
         <span className="label">sqUAd · made in Ukraine</span>
-        <span className="label">UCU · OOAD 2026</span>
+        <span className="flex gap-4">
+          <Link to="/privacy" className="label hover:text-fg">
+            Конфіденційність
+          </Link>
+          <span className="label">UCU · OOAD 2026</span>
+        </span>
       </footer>
     </Page>
   );
