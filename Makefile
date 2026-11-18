@@ -7,7 +7,9 @@ SHELL := /bin/bash
 # (Terraform cannot refresh an `aws login` session on its own).
 PROFILE ?=
 ifneq ($(PROFILE),)
-CREDS = eval "$$(aws configure export-credentials --profile $(PROFILE) --format env)" && unset AWS_PROFILE &&
+# If the session has expired, stop here: falling back to other keys on this
+# laptop could point Terraform at a different AWS account.
+CREDS = creds="$$(aws configure export-credentials --profile $(PROFILE) --format env)" || { echo "AWS session expired: run aws login --profile $(PROFILE)" >&2; exit 1; }; eval "$$creds" && unset AWS_PROFILE &&
 endif
 TF ?= $(CREDS) terraform
 AWS ?= $(CREDS) aws
