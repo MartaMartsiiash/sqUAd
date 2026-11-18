@@ -39,6 +39,6 @@ jobs:
         working-directory: infra
         run: |
           mkdir -p ../build/lambda && touch ../build/lambda/.keep
-          terraform fmt -check -recursive
+          terraform fmt -check -diff -recursive
           terraform init -backend=false -input=false
           terraform validate
