@@ -22,7 +22,8 @@ locals {
   domain_active = local.has_domain && var.attach_domain
   all_domains   = local.has_domain ? concat(var.extra_domains, [var.domain_name]) : []
   site_host     = local.has_domain ? local.all_domains[0] : ""
-  domain_urls   = [for d in (local.domain_active ? local.all_domains : []) : "https://${d}"]
+  attached      = local.domain_active ? local.all_domains : []
+  domain_urls   = [for d in local.attached : "https://${d}"]
   acm_options   = local.has_domain ? aws_acm_certificate.site[0].domain_validation_options : []
   acm_records   = [for o in local.acm_options : "${o.resource_record_name} CNAME ${o.resource_record_value}"]
 }
