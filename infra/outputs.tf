@@ -46,7 +46,7 @@ output "api_function" {
 
 output "acm_validation" {
   description = "Add this CNAME at your domain registrar (value with a dot at the end), then set attach_domain = true."
-  value = local.has_domain ? [for o in aws_acm_certificate.site[0].domain_validation_options : {
+  value       = local.has_domain ? [for o in aws_acm_certificate.site[0].domain_validation_options : {
     type  = o.resource_record_type
     name  = o.resource_record_name
     value = o.resource_record_value
