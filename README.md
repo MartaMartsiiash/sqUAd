@@ -10,7 +10,7 @@ rest of the evening. One scoreboard follows the group all evening.
 
 > The name is *squad* with **UA** inside: games for your squad, in Ukrainian.
 
-- **Live:** `make outputs` → `site_url`
+- **Live:** https://www.gamesquad.pp.ua (host sign-in: email + password or Google)
 - **How it is built:** [PROJECT.md](PROJECT.md) (structure, contracts, API)
 - **Why it is built this way:** [docs/adr](docs/adr)
 - **The games and their rules:** [docs/games.md](docs/games.md)
@@ -79,6 +79,14 @@ your monobank personal token from https://api.monobank.ua (it is used for one
 request and not stored). From then on every donation to the jar with a room code
 in the comment unlocks unlimited games for that room. `make payments` lists every
 tracked donation.
+
+**Own domain:** set `domain_name` (and `extra_domains`) in `terraform.tfvars`,
+run `make deploy`, add the `acm_validation` CNAME records at your DNS provider,
+then set `attach_domain = true` and deploy again. Point `www` at the
+`domain_cname_target` output.
+
+If a donation came in while the webhook was off: `make unlock CODE=K7Q2M`.
+`make logs` shows the API's log, one JSON line per webhook call.
 
 To remove everything: `make destroy`.
 
