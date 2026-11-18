@@ -10,7 +10,7 @@ from __future__ import annotations
 import secrets
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, clean_text, pick, require_phase, require_player
+from app.games.base import Game, add_points, clean_text, pick, require_phase, require_player, tidy_answer
 from app.games.content import FORGOTTEN_WORDS
 
 WRITE_SECONDS = 75
@@ -67,7 +67,7 @@ class ForgottenWords(Game):
         kind = action.get("type")
         if kind == "fake":
             require_phase(state, "write")
-            text = clean_text(action.get("text"), 90)
+            text = tidy_answer(clean_text(action.get("text"), 90))
             if _norm(text) == _norm(self._word(state)[1]):
                 raise DomainError("too_true", "Це і є справжнє значення! Вигадай інше")
             state["fakes"][player_id] = text

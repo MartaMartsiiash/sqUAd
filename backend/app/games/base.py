@@ -81,6 +81,14 @@ def clean_text(value: Any, limit: int = 120) -> str:
     return text
 
 
+def tidy_answer(text: str) -> str:
+    """Write every answer the same way: lower case, no full stop at the end.
+
+    Otherwise "Сковорідка." from a player stands out next to the real "сковорідка".
+    """
+    return text.lower().rstrip(" .!").strip() or text
+
+
 def add_points(state: State, player_id: str, points: int) -> None:
     state["points"][player_id] = state["points"].get(player_id, 0) + points
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, clean_text, pick, require_phase, require_player
+from app.games.base import Game, add_points, clean_text, pick, require_phase, require_player, tidy_answer
 from app.games.content import ASSOCIATION_WORDS
 
 WRITE_SECONDS = 30
@@ -51,7 +51,7 @@ class Associations(Game):
         kind = action.get("type")
         if kind == "answer":
             require_phase(state, "write")
-            state["answers"][player_id] = clean_text(action.get("text"), 30)
+            state["answers"][player_id] = tidy_answer(clean_text(action.get("text"), 30))
             if len(state["answers"]) == len(state["player_ids"]):
                 self._reveal(state, now)
         elif kind == "next":

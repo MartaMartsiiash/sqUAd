@@ -178,3 +178,10 @@ def test_a_second_round_brings_new_questions(client, room_with_players, clock):
         seen |= questions
         client.post(f"/api/rooms/{code}/games/stop", headers=H(t["Марта"]))
         client.post(f"/api/payments/monobank/s3cret/unlock/{code}")
+
+
+def test_answers_are_written_the_same_way_as_the_real_one():
+    from app.games.base import tidy_answer
+
+    assert tidy_answer("Стара Сковорідка.") == "стара сковорідка"
+    assert tidy_answer("ЛАВА!") == "лава"
