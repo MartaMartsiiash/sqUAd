@@ -88,6 +88,8 @@ resource "aws_cognito_user_pool_client" "web" {
 
 locals {
   has_google = var.google_client_id != ""
-  site_url   = "https://${aws_cloudfront_distribution.site.domain_name}"
-  site_urls  = concat([local.site_url], var.local_dev_urls)
+  cloudfront_url = "https://${aws_cloudfront_distribution.site.domain_name}"
+  # With an own domain the site answers on both addresses; sign-in and the API accept both.
+  site_url  = local.domain_active ? "https://${var.domain_name}" : local.cloudfront_url
+  site_urls = distinct(concat([local.site_url, local.cloudfront_url], var.local_dev_urls))
 }

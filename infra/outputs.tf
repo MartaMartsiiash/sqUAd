@@ -43,3 +43,17 @@ output "region" {
 output "api_function" {
   value = aws_lambda_function.api.function_name
 }
+
+output "acm_validation" {
+  description = "Add this CNAME at your domain registrar (value with a dot at the end), then set attach_domain = true."
+  value = local.has_domain ? [for o in aws_acm_certificate.site[0].domain_validation_options : {
+    type  = o.resource_record_type
+    name  = o.resource_record_name
+    value = o.resource_record_value
+  }] : []
+}
+
+output "domain_cname_target" {
+  description = "Point your domain (CNAME, or ALIAS/ANAME for a bare domain) at this address."
+  value       = aws_cloudfront_distribution.site.domain_name
+}

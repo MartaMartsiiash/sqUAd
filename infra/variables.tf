@@ -40,3 +40,15 @@ variable "local_dev_urls" {
   default     = ["http://localhost:5173"]
   description = "Extra origins allowed to sign in and call the API (local development)."
 }
+
+variable "domain_name" {
+  type        = string
+  default     = ""
+  description = "Own domain for the site, e.g. squad.pp.ua. Empty: the CloudFront address only."
+}
+
+variable "attach_domain" {
+  type        = bool
+  default     = false
+  description = "Step 2: set to true after the ACM validation CNAME is in DNS and the certificate is issued."
+}

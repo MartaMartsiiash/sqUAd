@@ -8,3 +8,7 @@ google_client_id = ""
 
 mono_jar_url      = "https://send.monobank.ua/jar/XXXXXXXX"
 premium_price_uah = 50
+
+# Own domain: step 1 set domain_name, step 2 (after the certificate is issued) attach_domain = true.
+# domain_name   = "squad.pp.ua"
+# attach_domain = false

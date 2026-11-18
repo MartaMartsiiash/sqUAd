@@ -66,8 +66,13 @@ resource "aws_cloudfront_distribution" "site" {
     }
   }
 
+  aliases = local.domain_active ? [var.domain_name] : []
+
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = local.domain_active ? null : true
+    acm_certificate_arn            = local.domain_active ? aws_acm_certificate_validation.site[0].certificate_arn : null
+    ssl_support_method             = local.domain_active ? "sni-only" : null
+    minimum_protocol_version       = local.domain_active ? "TLSv1.2_2021" : "TLSv1"
   }
 }
 
