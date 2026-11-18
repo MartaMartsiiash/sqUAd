@@ -181,36 +181,34 @@ export function Glare({ className = "" }: { className?: string }) {
  */
 export function TubeText({ text, className = "" }: { text: string; className?: string }) {
   const chars = Array.from(text.toUpperCase());
-  const step = 132;
-  const w = chars.length * step + 44;
-  const all = chars.map((ch, i) =>
-    TUBE_GLYPHS[ch] ? <path key={i} d={TUBE_GLYPHS[ch]} transform={`translate(${22 + i * step} 22)`} /> : null,
-  );
+  const step = 150;
+  const w = chars.length * step + 50;
   return (
     <svg viewBox={`0 0 ${w} 190`} className={className} role="img" aria-label={text}>
       <defs>
-        <filter id="tube-glow" x="-10%" y="-20%" width="120%" height="150%">
-          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#b3132f" floodOpacity="0.5" />
-        </filter>
-        <filter id="tube-soft">
-          <feGaussianBlur stdDeviation="2.2" />
-        </filter>
-        <filter id="tube-sharp">
-          <feGaussianBlur stdDeviation="0.8" />
+        {/* The stroke's blurred alpha is used as a height map: diffuse light gives the
+            round body, specular light the glossy streaks, then a red glow and a shadow. */}
+        <filter id="tube-light" x="-10%" y="-20%" width="120%" height="150%" colorInterpolationFilters="sRGB">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="height" />
+          <feDiffuseLighting in="height" surfaceScale="8" diffuseConstant="1.15" lightingColor="#ffb3be" result="diffuse">
+            <feDistantLight azimuth="240" elevation="40" />
+          </feDiffuseLighting>
+          <feComposite in="diffuse" in2="SourceGraphic" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" result="shaded" />
+          <feSpecularLighting in="height" surfaceScale="8" specularConstant="1.5" specularExponent="40" lightingColor="#ffffff" result="spec">
+            <feDistantLight azimuth="240" elevation="55" />
+          </feSpecularLighting>
+          <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn" />
+          <feComposite in="shaded" in2="specIn" operator="arithmetic" k1="0" k2="1" k3="0.85" k4="0" result="lit" />
+          <feComposite in="lit" in2="SourceAlpha" operator="in" result="tube" />
+          <feDropShadow in="tube" dx="0" dy="0" stdDeviation="6" floodColor="#d0122f" floodOpacity="0.55" result="glow" />
+          <feDropShadow in="glow" dx="0" dy="7" stdDeviation="7" floodColor="#000" floodOpacity="0.6" />
         </filter>
       </defs>
-      <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <g stroke="#2a0208" strokeWidth="40" filter="url(#tube-glow)">{all}</g>
-        <g stroke="#5e0618" strokeWidth="35">{all}</g>
-        <g stroke="#9d0f2b" strokeWidth="31" transform="translate(-1.5 -2.5)">{all}</g>
-        <g stroke="#c9213f" strokeWidth="20" strokeOpacity="0.9" filter="url(#tube-soft)" transform="translate(-3 -5)">
-          {all}
-        </g>
-        <g stroke="#f07d92" strokeWidth="8" strokeOpacity="0.75" filter="url(#tube-soft)" transform="translate(-5 -8)">
-          {all}
-        </g>
-        <g stroke="#fff2f4" strokeWidth="3" strokeOpacity="0.95" filter="url(#tube-sharp)" transform="translate(-6 -9)">
-          {all}
+      <g filter="url(#tube-light)">
+        <g fill="none" stroke="#a50f2d" strokeWidth="29" strokeLinecap="round" strokeLinejoin="round">
+          {chars.map((ch, i) =>
+            TUBE_GLYPHS[ch] ? <path key={i} d={TUBE_GLYPHS[ch]} transform={`translate(${36 + i * step} 22)`} /> : null,
+          )}
         </g>
       </g>
     </svg>

@@ -1,28 +1,27 @@
-// Single-stroke letter shapes for the room code, drawn on a 100 x 140 grid
-// (cap height from y=10 to the baseline at y=130). TubeText strokes them
-// thick with round ends so each letter looks like an inflated glossy tube.
-// Room codes use only these characters (no 0/O, no 1/I).
+// Single-stroke letter shapes for the room code (on a ~120 x 140 grid, baseline y=130).
+// TubeText strokes them thick and lights them with an SVG lighting filter, so each
+// letter looks like an inflated glossy tube. Codes use only these characters.
 export const TUBE_GLYPHS: Record<string, string> = {
   A: "M12 130 L50 12 L88 130 M27 88 L73 88",
   B: "M18 130 L18 12 L55 12 Q84 12 84 40 Q84 68 55 68 L18 68 M55 68 Q88 68 88 99 Q88 130 55 130 L18 130",
-  C: "M86 34 Q74 12 52 12 Q14 12 14 71 Q14 130 52 130 Q74 130 86 108",
+  C: "M88 34 Q74 12 52 13 Q12 18 12 72 Q13 128 54 128 Q77 127 89 108",
   D: "M18 130 L18 12 L44 12 Q86 12 86 71 Q86 130 44 130 L18 130",
   E: "M84 12 L18 12 L18 130 L84 130 M18 70 L70 70",
-  F: "M84 12 L18 12 L18 130 M18 68 L70 68",
+  F: "M22 130 Q20 72 21 20 Q50 14 84 18 M22 72 Q48 67 74 69",
   G: "M86 34 Q74 12 52 12 Q14 12 14 71 Q14 130 52 130 Q86 130 86 90 L86 76 L56 76",
   H: "M16 12 L16 130 M84 12 L84 130 M16 70 L84 70",
   J: "M78 12 L78 94 Q78 130 47 130 Q22 130 16 106",
   K: "M18 12 L18 130 M84 12 L18 82 M42 58 L86 130",
   L: "M18 12 L18 130 L84 130",
-  M: "M10 130 L16 12 L50 96 L84 12 L90 130",
+  M: "M12 130 Q13 62 22 22 Q28 6 37 20 L50 72 L63 20 Q72 6 78 22 Q87 62 88 130",
   N: "M16 130 L16 12 L84 130 L84 12",
   P: "M18 130 L18 12 L55 12 Q86 12 86 43 Q86 74 55 74 L18 74",
   Q: "M50 12 Q14 12 14 71 Q14 130 50 130 Q86 130 86 71 Q86 12 50 12 M60 102 L90 136",
-  R: "M18 130 L18 12 L55 12 Q86 12 86 43 Q86 74 55 74 L18 74 M50 74 L86 130",
+  R: "M22 130 L21 20 Q74 10 78 44 Q80 72 30 74 Q62 92 84 128",
   S: "M84 30 Q74 12 50 12 Q16 12 16 39 Q16 63 50 68 Q86 74 86 101 Q86 130 50 130 Q24 130 14 110",
   T: "M10 12 L90 12 M50 12 L50 130",
   U: "M16 12 L16 90 Q16 130 50 130 Q84 130 84 90 L84 12",
-  V: "M10 12 L50 130 L90 12",
+  V: "M12 16 Q30 80 46 124 Q50 134 55 124 Q72 80 88 16",
   W: "M6 12 L27 130 L50 52 L73 130 L94 12",
   X: "M16 12 L84 130 M84 12 L16 130",
   Y: "M12 12 L50 70 L88 12 M50 70 L50 130",
