@@ -171,10 +171,10 @@ export default function Room() {
       <div className="mb-5 flex items-end justify-between gap-3">
         <div className="min-w-0">
           <span className="label">Кімната</span>
-          <TubeText text={room.code} className="mt-1 h-14 w-auto sm:h-16" />
+          <TubeText text={room.code} className="mt-1 h-10 w-auto max-w-full sm:h-16" />
         </div>
         {/* On a phone the scoreboard is a tab; on a laptop it stays on the right. */}
-        <div className="flex rounded-full border border-line p-1 lg:hidden">
+        <div className="flex shrink-0 rounded-full border border-line p-1 lg:hidden">
           {(["game", "score"] as const).map((t) => (
             <button
               key={t}
