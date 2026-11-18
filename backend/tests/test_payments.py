@@ -83,3 +83,9 @@ def test_owner_can_unlock_by_hand(client, room_with_players):
     r = client.post(f"/api/payments/monobank/s3cret/unlock/{code.lower()}")
     assert r.json() == {"room_code": code, "unlocked": True}
     assert client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()["premium"] is True
+
+
+def test_code_typed_with_cyrillic_letters_is_found():
+    from app.services.payment_service import find_codes
+
+    assert "MPK7C" in find_codes("кімната МРК7С")  # Cyrillic М, Р, К, С

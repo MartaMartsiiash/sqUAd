@@ -25,8 +25,13 @@ from app.services.room_service import RoomService
 CODE_RE = re.compile(rf"(?<![A-Z0-9])[{CODE_ALPHABET}]{{{CODE_LENGTH}}}(?![A-Z0-9])")
 
 
+# People often type the code on a Ukrainian keyboard: "МРК7С" looks like MPK7C
+# but uses Cyrillic letters. Map the look-alikes to Latin before searching.
+LOOKALIKES = str.maketrans("АВЕКМНОРСТХУІЗ", "ABEKMHOPCTXYI3")
+
+
 def find_codes(text: str) -> list[str]:
-    return CODE_RE.findall(text.upper())
+    return CODE_RE.findall(text.upper().translate(LOOKALIKES))
 
 
 class PaymentService:
