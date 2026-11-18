@@ -2,8 +2,15 @@
 # CI runs the same targets, so a failed step can be repeated on a laptop.
 
 SHELL := /bin/bash
-TF ?= terraform
-AWS ?= aws
+# After `aws login --profile spry`, run any target with PROFILE=spry: every
+# terraform and aws call then gets fresh temporary keys from that session
+# (Terraform cannot refresh an `aws login` session on its own).
+PROFILE ?=
+ifneq ($(PROFILE),)
+CREDS = eval "$$(aws configure export-credentials --profile $(PROFILE) --format env)" && unset AWS_PROFILE &&
+endif
+TF ?= $(CREDS) terraform
+AWS ?= $(CREDS) aws
 PYTHON ?= python3
 TF_DIR := infra
 tf-out = $(TF) -chdir=$(TF_DIR) output -raw $(1)
