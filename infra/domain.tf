@@ -20,6 +20,9 @@ provider "aws" {
 locals {
   has_domain    = var.domain_name != ""
   domain_active = local.has_domain && var.attach_domain
+  all_domains   = local.has_domain ? concat(var.extra_domains, [var.domain_name]) : []
+  site_host     = local.has_domain ? local.all_domains[0] : ""
+  domain_urls   = [for d in (local.domain_active ? local.all_domains : []) : "https://${d}"]
   acm_options   = local.has_domain ? aws_acm_certificate.site[0].domain_validation_options : []
   acm_records   = [for o in local.acm_options : "${o.resource_record_name} CNAME ${o.resource_record_value}"]
 }
@@ -27,8 +30,9 @@ locals {
 resource "aws_acm_certificate" "site" {
   count             = local.has_domain ? 1 : 0
   provider          = aws.us_east_1
-  domain_name       = var.domain_name
-  validation_method = "DNS"
+  domain_name               = var.domain_name
+  subject_alternative_names = var.extra_domains
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true

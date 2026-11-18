@@ -47,6 +47,12 @@ variable "domain_name" {
   description = "Own domain for the site, e.g. squad.pp.ua. Empty: the CloudFront address only."
 }
 
+variable "extra_domains" {
+  type        = list(string)
+  default     = []
+  description = "More names for the same site, e.g. [\"www.squad.pp.ua\"]. The first one becomes the main address."
+}
+
 variable "attach_domain" {
   type        = bool
   default     = false

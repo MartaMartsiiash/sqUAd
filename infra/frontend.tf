@@ -66,7 +66,7 @@ resource "aws_cloudfront_distribution" "site" {
     }
   }
 
-  aliases = local.domain_active ? [var.domain_name] : []
+  aliases = local.domain_active ? local.all_domains : []
 
   viewer_certificate {
     cloudfront_default_certificate = local.domain_active ? null : true
