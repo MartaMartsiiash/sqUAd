@@ -8,11 +8,11 @@ from __future__ import annotations
 from collections import defaultdict
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, clean_text, require_phase, require_player
+from app.games.base import Game, add_points, clean_text, pick, require_phase, require_player
 from app.games.content import ASSOCIATION_WORDS
 
 WRITE_SECONDS = 30
-REVEAL_SECONDS = 12
+REVEAL_SECONDS = 45
 
 
 def normalize(word: str) -> str:
@@ -37,7 +37,8 @@ class Associations(Game):
         return {
             "phase": "write",
             "player_ids": ids,
-            "words": rng.sample(ASSOCIATION_WORDS, rounds),
+            "words": (words := pick(ASSOCIATION_WORDS, rounds, set(settings.get("_used", [])), rng)),
+            "_used": words,
             "round": 0,
             "answers": {},
             "last": None,

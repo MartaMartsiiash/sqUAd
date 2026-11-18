@@ -68,7 +68,7 @@ def test_who_of_us_majority_scores(client, room_with_players, clock):
     act(client, code, t["Олег"], type="vote", target=ids["Олег"])
     v = act(client, code, t["Іра"], type="vote", target=ids["Марта"])
     assert v["game"]["view"]["phase"] == "reveal"
-    clock.advance(30)
+    clock.advance(50)
     final = view(client, code, t["Марта"])
     assert final["game"]["view"]["phase"] == "finished"
     assert final["scores"][ids["Марта"]] == 1
@@ -84,7 +84,9 @@ def test_associations_matching_words(client, room_with_players):
     act(client, code, t["Олег"], type="answer", text="Сонце")
     v = act(client, code, t["Іра"], type="answer", text="Пиво")
     assert v["game"]["view"]["phase"] == "reveal"
-    v = act(client, code, t["Іра"], type="next")
+    r = client.post(f"/api/rooms/{code}/actions", json={"type": "next"}, headers=H(t["Іра"]))
+    assert r.status_code == 403  # only the host moves on to the next round
+    v = act(client, code, t["Марта"], type="next")
     assert v["game"]["view"]["phase"] == "finished"
     assert v["scores"][ids["Марта"]] == 2 and v["scores"][ids["Іра"]] == 0
 
@@ -112,7 +114,7 @@ def test_timer_moves_the_game_on(client, room_with_players, clock):
     start(client, code, t["Марта"], "associations", rounds=2)
     clock.advance(31)
     assert view(client, code, t["Олег"])["game"]["view"]["phase"] == "reveal"
-    clock.advance(13)
+    clock.advance(46)
     v = view(client, code, t["Олег"])["game"]["view"]
     assert v["phase"] == "write" and v["round"] == 2
 
@@ -130,13 +132,13 @@ def test_ni_tak_ni_ni_caught_and_timeout(client, room_with_players, clock):
     catcher = next(n for n in t if n != hot)
     v = act(client, code, t[catcher], type="caught")["game"]["view"]
     assert v["phase"] == "result" and v["last"]["survived"] == 65 and v["last"]["earned"] == 2
-    act(client, code, t[catcher], type="next")
+    act(client, code, t["Марта"], type="next")
     hot2 = names[view(client, code, t["Марта"])["game"]["view"]["hot"]]
     act(client, code, t[hot2], type="begin")
     clock.advance(121)
     final = view(client, code, t["Марта"])
     assert final["game"]["view"]["last"]["survived"] == 120
-    clock.advance(20)
+    clock.advance(50)
     final = view(client, code, t["Марта"])
     assert final["game"]["view"]["phase"] == "finished"
     assert final["scores"][ids[hot]] == 2 and final["scores"][ids[hot2]] >= 4
@@ -158,3 +160,21 @@ def test_forgotten_words_bluff(client, room_with_players, rooms):
         act(client, code, tok, type="vote", option=choice)
     v = view(client, code, t["Марта"])["game"]["view"]
     assert v["phase"] == "reveal" and v["last"]["real_id"]
+
+
+def test_a_second_round_brings_new_questions(client, room_with_players, clock):
+    code, t = room_with_players
+    seen = set()
+    for _ in range(5):
+        start(client, code, t["Марта"], "who_of_us", rounds=10)
+        questions = set()
+        for _ in range(10):
+            g = view(client, code, t["Марта"])["game"]["view"]
+            questions.add(g["question"])
+            clock.advance(41)
+            view(client, code, t["Марта"])
+            clock.advance(46)
+        assert not (questions & seen), "a question came back before the pool ran out"
+        seen |= questions
+        client.post(f"/api/rooms/{code}/games/stop", headers=H(t["Марта"]))
+        client.post(f"/api/payments/monobank/s3cret/unlock/{code}")

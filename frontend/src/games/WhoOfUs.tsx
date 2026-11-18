@@ -2,7 +2,7 @@ import { Avatar } from "../components/ui";
 import { NextButton, PhaseHeader, PlayerPicker, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
-export default function WhoOfUs({ room, view, offset, act }: GameProps) {
+export default function WhoOfUs({ room, view, offset, act, isHost }: GameProps) {
   const players = room.players.filter((p) => room.game?.player_ids.includes(p.id));
 
   if (view.phase === "vote") {
@@ -48,7 +48,7 @@ export default function WhoOfUs({ room, view, offset, act }: GameProps) {
           ))}
         </div>
         <p className="label mt-4 text-center">+1 бал тим, хто голосував як більшість</p>
-        <NextButton act={act} />
+        <NextButton act={act} isHost={isHost} />
       </div>
     );
   }

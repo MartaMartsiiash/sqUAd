@@ -17,25 +17,8 @@ CODE_LENGTH = 5
 MAX_PLAYERS = 16
 MAX_NAME_LENGTH = 20
 
-EMOJIS = ["🦊", "🐸", "🐼", "🦄", "🐙", "🐝", "🦉", "🐯", "🐨", "🐵", "🐧", "🐢", "🦖", "🐳", "🦋", "🐞"]
-COLORS = [
-    "#d1102f",
-    "#f2f2f2",
-    "#e05a6f",
-    "#9a9a9a",
-    "#ff7d8e",
-    "#c9c9c9",
-    "#a3001b",
-    "#7a7a7a",
-    "#f4b6bf",
-    "#bfbfbf",
-    "#e8325a",
-    "#dcdcdc",
-    "#c2185b",
-    "#adadad",
-    "#ff4f6a",
-    "#e6e6e6",
-]
+# Avatar colours: a chrome mannequin head in each (frontend/public/heads/<name>.png).
+AVATAR_COLORS = ["silver", "cherry", "rose", "violet", "gold", "ice", "graphite", "mint"]
 
 
 class DomainError(Exception):
@@ -61,19 +44,18 @@ def normalize_code(code: str) -> str:
 class Player:
     id: str
     name: str
-    emoji: str
     color: str
     token: str
     joined_at: float
     last_seen: float
     is_host: bool = False
+    emoji: str = ""  # unused since avatars became chrome heads; kept so old rooms still load
 
     def public(self, now: float) -> dict[str, Any]:
         """What other phones may see: never the token."""
         return {
             "id": self.id,
             "name": self.name,
-            "emoji": self.emoji,
             "color": self.color,
             "is_host": self.is_host,
             "online": now - self.last_seen < 15,
@@ -89,6 +71,7 @@ class Room:
     players: list[Player] = field(default_factory=list)
     scores: dict[str, int] = field(default_factory=dict)  # player id -> points tonight
     history: list[dict[str, Any]] = field(default_factory=list)  # finished games
+    used: dict[str, list[str]] = field(default_factory=dict)  # game id -> content already played
     game_id: str | None = None
     game_state: dict[str, Any] | None = None
     premium: bool = False  # unlimited games, after a donation
@@ -117,7 +100,7 @@ class Room:
                 return p
         raise DomainError("no_host", "У кімнати немає ведучого", 500)
 
-    def add_player(self, name: str, emoji: str | None, now: float, is_host: bool = False) -> Player:
+    def add_player(self, name: str, color: str | None, now: float, is_host: bool = False) -> Player:
         name = " ".join(name.split())[:MAX_NAME_LENGTH]
         if not name:
             raise DomainError("bad_name", "Введіть ім'я")
@@ -125,14 +108,14 @@ class Room:
             raise DomainError("room_full", f"У кімнаті вже {MAX_PLAYERS} гравців")
         if any(p.name.casefold() == name.casefold() for p in self.players):
             raise DomainError("name_taken", "Це ім'я вже зайняте, оберіть інше", 409)
-        used = {p.emoji for p in self.players}
-        if not emoji or emoji in used:
-            emoji = next((e for e in EMOJIS if e not in used), EMOJIS[len(self.players) % len(EMOJIS)])
+        taken = [p.color for p in self.players]
+        if color not in AVATAR_COLORS:
+            free = [c for c in AVATAR_COLORS if c not in taken]
+            color = free[0] if free else AVATAR_COLORS[len(self.players) % len(AVATAR_COLORS)]
         player = Player(
             id=secrets.token_hex(4),
             name=name,
-            emoji=emoji,
-            color=COLORS[len(self.players) % len(COLORS)],
+            color=color,
             token=secrets.token_urlsafe(24),
             joined_at=now,
             last_seen=now,
@@ -147,6 +130,13 @@ class Room:
         if player.is_host:
             raise DomainError("cannot_kick_host", "Ведучого не можна видалити")
         self.players = [p for p in self.players if p.id != player_id]
+
+    def leave(self, player_id: str) -> None:
+        """A player leaves on their own. If the host leaves, the next player becomes host."""
+        player = self.player(player_id)
+        self.players = [p for p in self.players if p.id != player_id]
+        if player.is_host and self.players:
+            self.players[0].is_host = True
 
     # ----- scores --------------------------------------------------------
 

@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import type { PlayerPublic } from "../api/client";
 import { useAuth } from "../auth/auth";
 
-/** The wordmark: "squad" with UA set apart in red. */
-export function Logo({ className = "text-xl", glossy = false }: { className?: string; glossy?: boolean }) {
+/** The wordmark from the brand artwork: a dark and a light version, switched by the theme. */
+export function Logo({ className = "h-8" }: { className?: string; glossy?: boolean }) {
   return (
-    <span className={`font-display font-extrabold lowercase tracking-tight ${className}`}>
-      sq<span className={glossy ? "ua-glossy" : "text-red uppercase"}>UA</span>d
+    <span className={`relative inline-block ${className}`}>
+      <img src="/brand/logo-dark.webp" alt="sqUAd" className="theme-dark-only h-full w-auto" draggable={false} />
+      <img src="/brand/logo-light.webp" alt="sqUAd" className="theme-light-only h-full w-auto" draggable={false} />
     </span>
   );
 }
@@ -48,7 +49,7 @@ export function Header() {
   return (
     <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-5 pt-5 lg:px-8">
       <Link to="/" aria-label="На головну">
-        <Logo className="text-2xl" />
+        <Logo className="h-7 sm:h-8" />
       </Link>
       <div className="flex min-w-0 items-center gap-3">
         {account && (
@@ -72,27 +73,29 @@ export function Header() {
 export function Page({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   return (
     <div className="relative flex min-h-full flex-col overflow-x-clip">
-      {/* Chrome loops in the margins: only on wide screens, where there is room for them. */}
-      <ChromeSquiggle variant={1} className="pointer-events-none fixed -left-8 bottom-10 hidden w-44 -rotate-12 opacity-90 xl:block" />
-      <ChromeSquiggle variant={2} className="pointer-events-none fixed right-4 top-28 hidden w-32 rotate-[25deg] opacity-90 xl:block" />
+      {/* Silver drops in the margins; small on a phone, bigger on a laptop. */}
+      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden" aria-hidden>
+        <Blob n={3} className="float absolute -left-10 bottom-16 w-28 opacity-80 [--r:-12deg] lg:w-56" />
+        <Blob n={4} className="float absolute -right-8 top-40 w-20 opacity-80 [--r:20deg] [animation-delay:-3s] lg:right-6 lg:w-40" />
+        <img src="/brand/drop.webp" alt="" className="float absolute right-[18%] top-24 w-4 opacity-80 [animation-delay:-5s] lg:w-6" />
+        <img src="/brand/drop.webp" alt="" className="float absolute bottom-40 left-[22%] w-3 opacity-70 [animation-delay:-2s] lg:w-5" />
+      </div>
       <Header />
-      <main className={`relative mx-auto w-full flex-1 px-5 pb-20 pt-6 ${wide ? "max-w-5xl lg:px-8" : "max-w-xl"}`}>
+      <main className={`relative z-10 mx-auto w-full flex-1 px-5 pb-20 pt-6 ${wide ? "max-w-5xl lg:px-8" : "max-w-xl"}`}>
         {children}
       </main>
     </div>
   );
 }
 
-/** A player's monogram: first letter of the name on the player's colour. */
-export function Avatar({ p, size = "h-10 w-10 text-base" }: { p: PlayerPublic; size?: string }) {
-  const letter = Array.from(p.name.trim())[0]?.toUpperCase() ?? "?";
+export const AVATAR_COLORS = ["silver", "cherry", "rose", "violet", "gold", "ice", "graphite", "mint"] as const;
+
+/** A player's avatar: a chrome mannequin head in the colour they chose. */
+export function Avatar({ p, size = "h-10 w-10" }: { p: Pick<PlayerPublic, "color" | "name">; size?: string }) {
+  const color = (AVATAR_COLORS as readonly string[]).includes(p.color) ? p.color : "silver";
   return (
-    <span
-      className={`inline-flex shrink-0 select-none items-center justify-center rounded-full font-display font-extrabold text-[#0a0a0a] ${size}`}
-      style={{ background: p.color }}
-      aria-hidden
-    >
-      {letter}
+    <span className={`inline-flex shrink-0 items-end justify-center overflow-hidden ${size}`} aria-hidden>
+      <img src={`/heads/${color}.webp`} alt="" className="h-full w-auto object-contain" draggable={false} />
     </span>
   );
 }
@@ -104,7 +107,7 @@ export function PlayerChip({ p, me, extra }: { p: PlayerPublic; me?: boolean; ex
         p.online ? "" : "opacity-45"
       }`}
     >
-      <Avatar p={p} size="h-8 w-8 text-sm" />
+      <Avatar p={p} size="h-9 w-8" />
       <span className="truncate font-semibold">{p.name}</span>
       {me && <span className="label">ви</span>}
       {p.is_host && <span className="label text-red">host</span>}
@@ -159,84 +162,57 @@ export function Num({ n, className = "" }: { n: number; className?: string }) {
   return <span className={`font-mono tabular-nums ${className}`}>{String(n).padStart(2, "0")}</span>;
 }
 
-/** A liquid-chrome shape drawn in SVG: grey bands like reflections, and a red reflection. */
-export function ChromeBlob({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 400 400" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="0.18" stopColor="#8e8e8e" />
-          <stop offset="0.32" stopColor="#1a1a1a" />
-          <stop offset="0.46" stopColor="#e9e9e9" />
-          <stop offset="0.6" stopColor="#5a5a5a" />
-          <stop offset="0.74" stopColor="#0d0d0d" />
-          <stop offset="0.88" stopColor="#bdbdbd" />
-          <stop offset="1" stopColor="#3a3a3a" />
-        </linearGradient>
-        <radialGradient id="redglint" cx="0.7" cy="0.75" r="0.45">
-          <stop offset="0" stopColor="#a5102e" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#a5102e" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="shine" cx="0.32" cy="0.25" r="0.3">
-          <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
-          <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
-        </radialGradient>
-        <filter id="soft">
-          <feGaussianBlur stdDeviation="0.6" />
-        </filter>
-      </defs>
-      <path
-        d="M197 38c58-6 120 18 146 70 25 50-6 92 9 142 14 47-14 101-70 113-52 11-82-26-130-20-51 7-96-12-110-58-14-45 22-74 18-120-4-44-24-86 12-111 35-25 70-11 125-16z"
-        fill="url(#chrome)"
-        filter="url(#soft)"
-      />
-      <path
-        d="M197 38c58-6 120 18 146 70 25 50-6 92 9 142 14 47-14 101-70 113-52 11-82-26-130-20-51 7-96-12-110-58-14-45 22-74 18-120-4-44-24-86 12-111 35-25 70-11 125-16z"
-        fill="url(#redglint)"
-      />
-      <path
-        d="M197 38c58-6 120 18 146 70 25 50-6 92 9 142 14 47-14 101-70 113-52 11-82-26-130-20-51 7-96-12-110-58-14-45 22-74 18-120-4-44-24-86 12-111 35-25 70-11 125-16z"
-        fill="url(#shine)"
-      />
-      <path
-        d="M140 120c30-30 90-36 120-8 22 20 10 52-14 58-30 8-46-22-76-12-26 8-50-16-30-38z"
-        fill="#050505"
-        opacity="0.55"
-        filter="url(#soft)"
-      />
-    </svg>
-  );
+/** Silver drops from the brand artwork, placed by the caller. */
+export function Blob({ n = 1, className = "" }: { n?: 1 | 2 | 3 | 4 | 5; className?: string }) {
+  return <img src={`/brand/blob${n}.webp`} alt="" aria-hidden draggable={false} className={`pointer-events-none select-none ${className}`} />;
 }
 
-/** A loop of liquid chrome, the small decorative element from the references. */
-const SQUIGGLES = [
-  "M40 150 C 40 60, 150 40, 170 100 C 190 160, 110 190, 100 140 C 90 90, 200 60, 250 110 C 290 150, 260 200, 220 190",
-  "M60 60 C 140 20, 200 80, 150 120 C 100 160, 60 120, 110 90 C 170 55, 260 120, 220 180 C 200 205, 150 200, 160 170",
-  "M30 120 C 70 40, 130 60, 120 110 C 110 160, 170 190, 210 140 C 240 100, 200 50, 170 80 C 150 100, 200 150, 270 120",
-];
+/** The red glitch glare from the brand artwork. */
+export function Glare({ className = "" }: { className?: string }) {
+  return <img src="/brand/glare.webp" alt="" aria-hidden draggable={false} className={`pointer-events-none select-none ${className}`} />;
+}
 
-export function ChromeSquiggle({ className = "", variant = 0 }: { className?: string; variant?: number }) {
-  const d = SQUIGGLES[variant % SQUIGGLES.length];
+/**
+ * Text drawn as glossy cherry-red tubes, like the room-code artwork: a rounded
+ * thin font, stroked thick in layers (dark edge, body, soft light on top).
+ */
+export function TubeText({ text, className = "" }: { text: string; className?: string }) {
+  const w = Math.max(1, text.length) * 118 + 40;
+  const glyphs = (
+    <text
+      x={w / 2}
+      y="132"
+      textAnchor="middle"
+      fontFamily="Quicksand, ui-rounded, sans-serif"
+      fontWeight="300"
+      fontSize="150"
+      letterSpacing="18"
+    >
+      {text}
+    </text>
+  );
   return (
-    <svg viewBox="0 0 300 230" className={className} aria-hidden>
+    <svg viewBox={`0 0 ${w} 180`} className={className} role="img" aria-label={text}>
       <defs>
-        <linearGradient id="sq-chrome" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fafafa" />
-          <stop offset="0.25" stopColor="#6d6d6d" />
-          <stop offset="0.45" stopColor="#f0f0f0" />
-          <stop offset="0.6" stopColor="#1c1c1c" />
-          <stop offset="0.8" stopColor="#d9d9d9" />
-          <stop offset="1" stopColor="#4a4a4a" />
+        <linearGradient id="tube-body" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#d6405b" />
+          <stop offset="0.45" stopColor="#a10f2c" />
+          <stop offset="1" stopColor="#4d0412" />
         </linearGradient>
-        <filter id="sq-shadow" x="-20%" y="-20%" width="140%" height="150%">
-          <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#000" floodOpacity="0.45" />
+        <filter id="tube-blur">
+          <feGaussianBlur stdDeviation="1.6" />
+        </filter>
+        <filter id="tube-glow" x="-10%" y="-20%" width="120%" height="150%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#a10f2c" floodOpacity="0.45" />
         </filter>
       </defs>
-      <path d={d} fill="none" stroke="#2a2a2a" strokeWidth="30" strokeLinecap="round" filter="url(#sq-shadow)" />
-      <path d={d} fill="none" stroke="url(#sq-chrome)" strokeWidth="26" strokeLinecap="round" />
-      <path d={d} fill="none" stroke="#ffffff" strokeOpacity="0.7" strokeWidth="4" strokeLinecap="round" transform="translate(-4 -6)" />
-      <path d={d} fill="none" stroke="#8f0b27" strokeOpacity="0.4" strokeWidth="3" strokeLinecap="round" transform="translate(5 7)" />
+      <g strokeLinejoin="round" strokeLinecap="round" style={{ textTransform: "none" }}>
+        <g fill="#3d020c" stroke="#3d020c" strokeWidth="26" filter="url(#tube-glow)">{glyphs}</g>
+        <g fill="url(#tube-body)" stroke="url(#tube-body)" strokeWidth="21">{glyphs}</g>
+        <g fill="#ffd2da" stroke="#ffd2da" fillOpacity="0.5" strokeOpacity="0.35" strokeWidth="2" filter="url(#tube-blur)" transform="translate(-3 -6)">
+          {glyphs}
+        </g>
+      </g>
     </svg>
   );
 }

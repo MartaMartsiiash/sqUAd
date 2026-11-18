@@ -10,12 +10,12 @@ from __future__ import annotations
 import secrets
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, clean_text, require_phase, require_player
+from app.games.base import Game, add_points, clean_text, pick, require_phase, require_player
 from app.games.content import FORGOTTEN_WORDS
 
 WRITE_SECONDS = 75
 VOTE_SECONDS = 40
-REVEAL_SECONDS = 15
+REVEAL_SECONDS = 45
 REAL = "real"
 
 
@@ -41,7 +41,15 @@ class ForgottenWords(Game):
         return {
             "phase": "write",
             "player_ids": ids,
-            "words": [list(w) for w in rng.sample(FORGOTTEN_WORDS, rounds)],
+            "words": (
+                words := [
+                    list(w)
+                    for w in pick(
+                        FORGOTTEN_WORDS, rounds, set(settings.get("_used", [])), rng, key=lambda w: w[0]
+                    )
+                ]
+            ),
+            "_used": [w[0] for w in words],
             "round": 0,
             "fakes": {},
             "options": [],

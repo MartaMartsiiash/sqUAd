@@ -27,8 +27,8 @@ export default function Host() {
       <h1 className="display pop mb-6 mt-2 text-4xl">Нова кімната</h1>
       <NameForm
         submitLabel="Створити кімнату"
-        onSubmit={async (name) => {
-          const res = await api.createRoom(account.token, name);
+        onSubmit={async (name, color) => {
+          const res = await api.createRoom(account.token, name, color);
           session.set(res.code, res.token);
           navigate(`/room/${res.code}`);
         }}

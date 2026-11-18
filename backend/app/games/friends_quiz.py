@@ -8,11 +8,11 @@ Phases per round: pick -> reveal. Then the next round or finished.
 from __future__ import annotations
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, require_phase, require_player
+from app.games.base import Game, add_points, pick, require_phase, require_player
 from app.games.content import FRIENDS_QUIZ_PAIRS
 
 PICK_SECONDS = 30
-REVEAL_SECONDS = 10
+REVEAL_SECONDS = 45
 
 
 class FriendsQuiz(Game):
@@ -36,7 +36,19 @@ class FriendsQuiz(Game):
             "phase": "pick",
             "player_ids": ids,
             "subjects": subjects,
-            "pairs": [list(p) for p in rng.sample(FRIENDS_QUIZ_PAIRS, len(subjects))],
+            "pairs": (
+                pairs := [
+                    list(p)
+                    for p in pick(
+                        FRIENDS_QUIZ_PAIRS,
+                        len(subjects),
+                        set(settings.get("_used", [])),
+                        rng,
+                        key=lambda p: f"{p[0]}|{p[1]}",
+                    )
+                ]
+            ),
+            "_used": [f"{a}|{b}" for a, b in pairs],
             "round": 0,
             "choice": None,
             "guesses": {},

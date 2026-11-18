@@ -73,7 +73,7 @@ def test_two_free_games_then_locked_until_paid(client, room_with_players, rooms,
         assert r.status_code == 200, r.text
         clock.advance(31)
         client.get(f"/api/rooms/{code}", headers=H(t["Марта"]))
-        clock.advance(13)
+        clock.advance(46)
         assert (
             client.get(f"/api/rooms/{code}", headers=H(t["Марта"])).json()["game"]["view"]["phase"]
             == "finished"
@@ -101,3 +101,20 @@ def test_reconnect_with_the_same_token(client, room_with_players):
     first = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()["me"]
     again = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()["me"]
     assert first["id"] == again["id"]
+
+
+def test_player_leaves_and_host_hands_over(client, room_with_players):
+    code, t = room_with_players
+    assert client.post(f"/api/rooms/{code}/leave", headers=H(t["Олег"])).status_code == 200
+    assert client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).status_code == 403
+    client.post(f"/api/rooms/{code}/leave", headers=H(t["Марта"]))
+    view = client.get(f"/api/rooms/{code}", headers=H(t["Вероніка"])).json()
+    assert [p["name"] for p in view["players"]] == ["Вероніка", "Іра"]
+    assert view["me"]["is_host"] is True
+
+
+def test_avatar_colour(client, room_with_players):
+    code, _ = room_with_players
+    r = client.post(f"/api/rooms/{code}/join", json={"name": "Тарас", "color": "gold"})
+    view = client.get(f"/api/rooms/{code}", headers=H(r.json()["token"])).json()
+    assert view["me"]["color"] == "gold"

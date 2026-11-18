@@ -21,12 +21,12 @@ router = APIRouter(prefix="/api")
 
 class CreateRoomIn(BaseModel):
     name: str = Field(min_length=1, max_length=40)
-    emoji: str | None = None
+    color: str | None = None
 
 
 class JoinIn(BaseModel):
     name: str = Field(min_length=1, max_length=40)
-    emoji: str | None = None
+    color: str | None = None
 
 
 class StartGameIn(BaseModel):
@@ -48,13 +48,13 @@ def games() -> list[dict[str, Any]]:
 def create_room(
     body: CreateRoomIn, host: Host = Depends(current_host), rooms: RoomService = Depends(get_room_service)
 ) -> dict[str, Any]:
-    room, player = rooms.create_room(host.sub, body.name, body.emoji)
+    room, player = rooms.create_room(host.sub, body.name, body.color)
     return {"code": room.code, "player_id": player.id, "token": player.token}
 
 
 @router.post("/rooms/{code}/join", status_code=201)
 def join_room(code: str, body: JoinIn, rooms: RoomService = Depends(get_room_service)) -> dict[str, Any]:
-    room, player = rooms.join(code, body.name, body.emoji)
+    room, player = rooms.join(code, body.name, body.color)
     return {"code": room.code, "player_id": player.id, "token": player.token}
 
 
@@ -94,6 +94,16 @@ def act(
     rooms: RoomService = Depends(get_room_service),
 ) -> dict[str, Any]:
     return rooms.act(code, x_player_token, action)
+
+
+@router.post("/rooms/{code}/leave")
+def leave(
+    code: str,
+    x_player_token: str | None = Header(default=None),
+    rooms: RoomService = Depends(get_room_service),
+) -> dict[str, str]:
+    rooms.leave(code, x_player_token)
+    return {"status": "left"}
 
 
 @router.delete("/rooms/{code}/players/{player_id}")

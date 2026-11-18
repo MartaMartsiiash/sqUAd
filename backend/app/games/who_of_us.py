@@ -8,11 +8,11 @@ from __future__ import annotations
 from collections import Counter
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, require_phase, require_player
+from app.games.base import Game, add_points, pick, require_phase, require_player
 from app.games.content import WHO_OF_US_QUESTIONS
 
 VOTE_SECONDS = 40
-REVEAL_SECONDS = 12
+REVEAL_SECONDS = 45
 
 
 class WhoOfUs(Game):
@@ -33,7 +33,10 @@ class WhoOfUs(Game):
         return {
             "phase": "vote",
             "player_ids": ids,
-            "questions": rng.sample(WHO_OF_US_QUESTIONS, rounds),
+            "questions": (
+                questions := pick(WHO_OF_US_QUESTIONS, rounds, set(settings.get("_used", [])), rng)
+            ),
+            "_used": questions,
             "round": 0,
             "votes": {},
             "last": None,

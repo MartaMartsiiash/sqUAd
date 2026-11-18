@@ -45,7 +45,7 @@ function Clock({ deadline, total, offset }: { deadline: number; total: number; o
   );
 }
 
-export default function NiTakNiNi({ view, byId, offset, act }: GameProps) {
+export default function NiTakNiNi({ view, byId, offset, act, isHost }: GameProps) {
   const [asked, setAsked] = useState<number[]>([]);
   const hot = byId[view.hot];
   const forbidden = view.forbidden as string[];
@@ -133,7 +133,7 @@ export default function NiTakNiNi({ view, byId, offset, act }: GameProps) {
           </p>
           <p className="font-mono mt-2 text-red">+{last.earned} бал(и)</p>
         </Spotlight>
-        <NextButton act={act} />
+        <NextButton act={act} isHost={isHost} />
       </div>
     );
   }

@@ -2,7 +2,7 @@ import { Waiting } from "../components/ui";
 import { NextButton, PhaseHeader, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
-export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps) {
+export default function FriendsQuiz({ room, view, byId, offset, act, isHost }: GameProps) {
   const subject = byId[view.subject];
   const pair = view.pair as [string, string];
   const total = room.game?.player_ids.length ?? 0;
@@ -55,7 +55,7 @@ export default function FriendsQuiz({ room, view, byId, offset, act }: GameProps
             </p>
           </Spotlight>
         )}
-        <NextButton act={act} />
+        <NextButton act={act} isHost={isHost} />
       </div>
     );
   }

@@ -5,7 +5,7 @@ import type { GameProps } from "./types";
 
 type Option = { id: string; text: string; mine?: boolean; authors?: string[] };
 
-export default function ForgottenWords({ room, view, me, byId, offset, act }: GameProps) {
+export default function ForgottenWords({ room, view, me, byId, offset, act, isHost }: GameProps) {
   const [text, setText] = useState("");
   const total = room.game?.player_ids.length ?? 0;
 
@@ -101,7 +101,7 @@ export default function ForgottenWords({ room, view, me, byId, offset, act }: Ga
               );
             })}
         </div>
-        <NextButton act={act} />
+        <NextButton act={act} isHost={isHost} />
       </div>
     );
   }

@@ -54,9 +54,13 @@ export function Progress({ done, total, label = "відповіли" }: { done: 
   );
 }
 
-export function NextButton({ act }: { act: GameProps["act"] }) {
+/** Only the host moves on, so everyone has time to see the results. */
+export function NextButton({ act, isHost }: { act: GameProps["act"]; isHost: boolean }) {
+  if (!isHost) {
+    return <p className="label mt-5 text-center">Ведучий перемкне далі, коли всі подивляться</p>;
+  }
   return (
-    <button className="btn-ghost mt-5 w-full" onClick={() => act({ type: "next" })}>
+    <button className="btn-primary mt-5 w-full" onClick={() => act({ type: "next" })}>
       Далі
     </button>
   );

@@ -5,7 +5,7 @@ export const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000")
 export type PlayerPublic = {
   id: string;
   name: string;
-  emoji: string;
+  /** avatar colour name: silver, cherry, rose, violet, gold, ice, graphite, mint */
   color: string;
   is_host: boolean;
   online: boolean;
@@ -83,12 +83,12 @@ type Joined = { code: string; player_id: string; token: string };
 
 export const api = {
   games: () => request<GameMeta[]>("/api/games"),
-  createRoom: (auth: string, name: string, emoji?: string) =>
-    request<Joined>("/api/rooms", { method: "POST", auth, body: JSON.stringify({ name, emoji }) }),
-  join: (code: string, name: string, emoji?: string) =>
+  createRoom: (auth: string, name: string, color?: string) =>
+    request<Joined>("/api/rooms", { method: "POST", auth, body: JSON.stringify({ name, color }) }),
+  join: (code: string, name: string, color?: string) =>
     request<Joined>(`/api/rooms/${encodeURIComponent(code)}/join`, {
       method: "POST",
-      body: JSON.stringify({ name, emoji }),
+      body: JSON.stringify({ name, color }),
     }),
   room: (code: string, token: string) => request<RoomView>(`/api/rooms/${code}`, { token }),
   startGame: (code: string, token: string, game_id: string, settings: object = {}) =>
@@ -101,6 +101,8 @@ export const api = {
     request<RoomView>(`/api/rooms/${code}/games/stop`, { method: "POST", token }),
   act: (code: string, token: string, action: object) =>
     request<RoomView>(`/api/rooms/${code}/actions`, { method: "POST", token, body: JSON.stringify(action) }),
+  leave: (code: string, token: string) =>
+    request<{ status: string }>(`/api/rooms/${code}/leave`, { method: "POST", token }),
   kick: (code: string, token: string, playerId: string) =>
     request<RoomView>(`/api/rooms/${code}/players/${playerId}`, { method: "DELETE", token }),
 };

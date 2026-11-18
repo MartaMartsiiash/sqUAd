@@ -3,7 +3,7 @@ import { Waiting } from "../components/ui";
 import { NextButton, PhaseHeader, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
-export default function TwoTruths({ room, view, me, byId, offset, act }: GameProps) {
+export default function TwoTruths({ room, view, me, byId, offset, act, isHost }: GameProps) {
   const [facts, setFacts] = useState(["", "", ""]);
   const [lie, setLie] = useState<number | null>(null);
   const total = room.game?.player_ids.length ?? 0;
@@ -102,7 +102,7 @@ export default function TwoTruths({ room, view, me, byId, offset, act }: GamePro
         <p className="mt-4 text-center text-muted">
           Обдурено: <b className="text-fg">{view.last.fooled}</b> · автору +{view.last.fooled}
         </p>
-        <NextButton act={act} />
+        <NextButton act={act} isHost={isHost} />
       </div>
     );
   }

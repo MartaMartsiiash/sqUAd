@@ -2,7 +2,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, ApiError, session, type GameMeta, type RoomView } from "../api/client";
-import { Avatar, ChromeSquiggle, ErrorNote, Num, Page, PlayerChip, Waiting } from "../components/ui";
+import { Avatar, Blob, ErrorNote, Num, Page, PlayerChip, TubeText, Waiting } from "../components/ui";
 import Associations from "../games/Associations";
 import { GamePoints } from "../games/common";
 import ForgottenWords from "../games/ForgottenWords";
@@ -169,9 +169,9 @@ export default function Room() {
   return (
     <Page wide>
       <div className="mb-5 flex items-end justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <span className="label">Кімната</span>
-          <p className="mt-1 font-mono text-3xl font-semibold tracking-[0.25em] text-red">{room.code}</p>
+          <TubeText text={room.code} className="mt-1 h-12 w-auto sm:h-14" />
         </div>
         {/* On a phone the scoreboard is a tab; on a laptop it stays on the right. */}
         <div className="flex rounded-full border border-line p-1 lg:hidden">
@@ -193,6 +193,7 @@ export default function Room() {
         <div className={tab === "score" ? "hidden lg:block" : ""}>
           {main}
           <ErrorNote text={actionError} />
+          <LeaveRoom code={upper} token={token} isHost={isHost} />
         </div>
         <div className={tab === "score" ? "lg:hidden" : "hidden"}>
           <Scoreboard room={room} byId={byId} />
@@ -202,6 +203,25 @@ export default function Room() {
         </aside>
       </div>
     </Page>
+  );
+}
+
+/** Leave this room on this phone, e.g. to join another one. */
+function LeaveRoom({ code, token, isHost }: { code: string; token: string; isHost: boolean }) {
+  const navigate = useNavigate();
+  const leave = async () => {
+    const note = isHost ? " Ведучим стане наступний гравець." : "";
+    if (!confirm(`Вийти з кімнати ${code}?${note}`)) return;
+    await api.leave(code, token).catch(() => {});
+    session.clear(code);
+    navigate("/", { replace: true });
+  };
+  return (
+    <div className="mt-8 text-center">
+      <button className="label underline-offset-4 hover:text-red hover:underline" onClick={leave}>
+        Вийти з кімнати
+      </button>
+    </div>
   );
 }
 
@@ -243,7 +263,7 @@ function Lobby({ room, token, isHost, run }: {
     <div className="space-y-4">
       <div className="space-y-4">
       <div className="card pop relative overflow-hidden text-center">
-        <ChromeSquiggle className="pointer-events-none absolute -right-3 -top-3 w-28 rotate-12" />
+        <Blob n={4} className="float absolute -right-4 -top-4 w-20 [--r:15deg]" />
         {showQr && (
           <div className="mx-auto w-fit rounded-[20px] bg-white p-4">
             <QRCodeSVG value={joinUrl} size={196} fgColor="#0a0a0a" />
@@ -372,14 +392,14 @@ function Premium({ room }: { room: RoomView }) {
         секунд.
       </p>
       <button
-        className="mt-4 w-full rounded-2xl border border-dashed border-red/60 py-3 font-mono text-2xl font-semibold tracking-[0.3em] text-red"
+        className="mt-4 flex w-full flex-col items-center rounded-2xl border border-dashed border-red/60 py-3"
         onClick={() => {
           navigator.clipboard?.writeText(room.code);
           setCopied(true);
         }}
       >
-        {room.code}
-        <span className="label ml-3 tracking-[0.1em]">{copied ? "скопійовано" : "копіювати"}</span>
+        <TubeText text={room.code} className="h-12 w-auto" />
+        <span className="label mt-1">{copied ? "скопійовано" : "натисни, щоб скопіювати"}</span>
       </button>
       {room.jar_url ? (
         <a className="btn-primary mt-3 w-full" href={room.jar_url} target="_blank" rel="noreferrer">
@@ -408,11 +428,11 @@ function Scoreboard({ room, byId }: { room: RoomView; byId: GameProps["byId"] })
       {leader && (
         <div className="pop card relative overflow-hidden border-red/50 text-center">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,var(--glow),transparent_70%)]" />
-          <ChromeSquiggle className="pointer-events-none absolute -left-6 -top-4 w-24 -rotate-12" />
+          <Blob n={5} className="float absolute -left-4 -top-4 w-20 [--r:-15deg]" />
           <div className="relative">
             <span className="label">MVP вечора</span>
             <div className="mt-4 flex justify-center">
-              <Avatar p={leader} size="h-20 w-20 text-3xl" />
+              <Avatar p={leader} size="h-28 w-24" />
             </div>
             <p className="display mt-4 text-3xl">{leader.name}</p>
             <p className="mt-1 font-mono text-red">{rows[0].points} балів</p>

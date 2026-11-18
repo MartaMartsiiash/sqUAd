@@ -142,3 +142,20 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .pop, .drift { animation: none; }
 }
+
+/* The logo artwork has a dark and a light version; show the one for the theme. */
+[data-theme="light"] .theme-dark-only,
+:root:not([data-theme="light"]) .theme-light-only {
+  display: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-10px) rotate(calc(var(--r, 0deg) + 4deg)); }
+}
+.float {
+  animation: float 9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .float { animation: none; }
+}

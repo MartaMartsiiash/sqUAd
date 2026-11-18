@@ -10,7 +10,7 @@ from app.games.base import Game, add_points, clean_text, require_phase, require_
 
 WRITE_SECONDS = 3 * 60
 GUESS_SECONDS = 45
-REVEAL_SECONDS = 12
+REVEAL_SECONDS = 45
 
 
 class TwoTruths(Game):

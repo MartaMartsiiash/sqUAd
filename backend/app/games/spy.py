@@ -8,7 +8,7 @@ from __future__ import annotations
 from collections import Counter
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, require_phase, require_player
+from app.games.base import Game, add_points, pick, require_phase, require_player
 from app.games.content import SPY_LOCATIONS
 
 DISCUSS_SECONDS = 5 * 60
@@ -32,7 +32,7 @@ class Spy(Game):
 
     def start(self, players, settings, rng, now):
         ids = [p["id"] for p in players]
-        location = rng.choice(SPY_LOCATIONS)
+        location = pick(SPY_LOCATIONS, 1, set(settings.get("_used", [])), rng)[0]
         others = [loc for loc in SPY_LOCATIONS if loc != location]
         options = rng.sample(others, GUESS_OPTIONS - 1) + [location]
         rng.shuffle(options)
@@ -50,6 +50,7 @@ class Spy(Game):
             "accused": None,
             "spy_guess": None,
             "points": {pid: 0 for pid in ids},
+            "_used": [location],
         }
 
     def act(self, state, player_id, action, now):

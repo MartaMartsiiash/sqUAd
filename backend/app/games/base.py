@@ -83,3 +83,13 @@ def clean_text(value: Any, limit: int = 120) -> str:
 
 def add_points(state: State, player_id: str, points: int) -> None:
     state["points"][player_id] = state["points"].get(player_id, 0) + points
+
+
+def pick(pool: list, n: int, used: set[str], rng: random.Random, key=str) -> list:
+    """Choose n items, preferring ones this room has not played yet (unseen first, then
+    the rest), so a second round of the same game brings new questions."""
+    fresh = [x for x in pool if key(x) not in used]
+    stale = [x for x in pool if key(x) in used]
+    rng.shuffle(fresh)
+    rng.shuffle(stale)
+    return (fresh + stale)[:n]

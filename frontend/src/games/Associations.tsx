@@ -3,7 +3,7 @@ import { Avatar, Waiting } from "../components/ui";
 import { NextButton, PhaseHeader, Progress, Spotlight } from "./common";
 import type { GameProps } from "./types";
 
-export default function Associations({ room, view, byId, offset, act }: GameProps) {
+export default function Associations({ room, view, byId, offset, act, isHost }: GameProps) {
   const [text, setText] = useState("");
   const total = room.game?.player_ids.length ?? 0;
 
@@ -78,7 +78,7 @@ export default function Associations({ room, view, byId, offset, act }: GameProp
             </div>
           ))}
         </div>
-        <NextButton act={act} />
+        <NextButton act={act} isHost={isHost} />
       </div>
     );
   }

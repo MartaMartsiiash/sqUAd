@@ -82,7 +82,7 @@ class RoomService:
 
     # ----- use cases -----------------------------------------------------
 
-    def create_room(self, host_sub: str, host_name: str, emoji: str | None = None) -> tuple[Room, Any]:
+    def create_room(self, host_sub: str, host_name: str, color: str | None = None) -> tuple[Room, Any]:
         now = self.clock()
         for _ in range(10):
             room = Room(
@@ -91,14 +91,14 @@ class RoomService:
                 created_at=now,
                 expires_at=now + self.settings.room_ttl_hours * 3600,
             )
-            host = room.add_player(host_name, emoji, now, is_host=True)
+            host = room.add_player(host_name, color, now, is_host=True)
             if self.repo.create(room):
                 return room, host
         raise DomainError("no_code", "Не вдалося створити кімнату, спробуйте ще раз", 500)
 
-    def join(self, code: str, name: str, emoji: str | None = None):
+    def join(self, code: str, name: str, color: str | None = None):
         def change(room: Room):
-            return room.add_player(name, emoji, self.clock())
+            return room.add_player(name, color, self.clock())
 
         room, player = self._mutate(code, change)
         return room, player
@@ -143,7 +143,11 @@ class RoomService:
             players = [{"id": p.id, "name": p.name} for p in room.players]
             room.games_started += 1
             room.game_id = game.id
-            room.game_state = game.start(players, settings or {}, self.rng, self.clock())
+            used = room.used.get(game.id, [])
+            state = game.start(players, {**(settings or {}), "_used": used}, self.rng, self.clock())
+            # Remember what this game showed, so the next round of it brings new content.
+            room.used[game.id] = (used + state.pop("_used", []))[-300:]
+            room.game_state = state
 
         room, _ = self._mutate(code, change)
         return self._render(room, room.player_by_token(token).id)
@@ -153,6 +157,9 @@ class RoomService:
             me = room.player_by_token(token)
             if not room.game_id or room.game_state is None:
                 raise DomainError("no_game", "Зараз немає гри")
+            if action.get("type") == "next" and not me.is_host:
+                # Only the host moves on, so nobody skips the results before everyone has seen them.
+                raise DomainError("host_only", "Далі перемикає ведучий", 403)
             self._advance_game(room)
             game = get_game(room.game_id)
             room.game_state = game.act(room.game_state, me.id, action, self.clock())
@@ -181,6 +188,14 @@ class RoomService:
 
         room, _ = self._mutate(code, change)
         return self._render(room, room.player_by_token(token).id)
+
+    def leave(self, code: str, token: str | None) -> None:
+        """A player leaves the room (for example, to join another one)."""
+
+        def change(room: Room):
+            room.leave(room.player_by_token(token).id)
+
+        self._mutate(code, change)
 
     def unlock_premium(self, code: str) -> bool:
         try:

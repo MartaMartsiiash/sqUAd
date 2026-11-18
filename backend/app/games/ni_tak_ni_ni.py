@@ -8,13 +8,13 @@ presses "Caught!". Phases per turn: ready -> turn -> result.
 from __future__ import annotations
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, require_phase, require_player
+from app.games.base import Game, add_points, pick, require_phase, require_player
 from app.games.content import NI_TAK_FORBIDDEN, NI_TAK_QUESTIONS
 
 TURN_SECONDS = 120
 SECONDS_PER_POINT = 30
 QUESTIONS_PER_TURN = 10
-RESULT_SECONDS = 15
+RESULT_SECONDS = 45
 
 
 class NiTakNiNi(Game):
@@ -40,7 +40,18 @@ class NiTakNiNi(Game):
             "player_ids": ids,
             "order": order[:turns],
             "turn": 0,
-            "questions": [rng.sample(NI_TAK_QUESTIONS, QUESTIONS_PER_TURN) for _ in range(turns)],
+            "questions": (
+                qs := [
+                    chosen[i * QUESTIONS_PER_TURN : (i + 1) * QUESTIONS_PER_TURN]
+                    for chosen in [
+                        pick(
+                            NI_TAK_QUESTIONS, QUESTIONS_PER_TURN * turns, set(settings.get("_used", [])), rng
+                        )
+                    ]
+                    for i in range(turns)
+                ]
+            ),
+            "_used": [q for turn in qs for q in turn],
             "started_at": None,
             "deadline": None,
             "last": None,

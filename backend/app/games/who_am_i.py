@@ -7,7 +7,7 @@ Phases: play -> finished. Players ask yes/no questions out loud and press
 from __future__ import annotations
 
 from app.domain.room import DomainError
-from app.games.base import Game, add_points, require_phase, require_player
+from app.games.base import Game, add_points, pick, require_phase, require_player
 from app.games.content import WHO_AM_I_CHARACTERS
 
 PLAY_SECONDS = 10 * 60
@@ -27,7 +27,7 @@ class WhoAmI(Game):
 
     def start(self, players, settings, rng, now):
         ids = [p["id"] for p in players]
-        chars = rng.sample(WHO_AM_I_CHARACTERS, len(ids))
+        chars = pick(WHO_AM_I_CHARACTERS, len(ids), set(settings.get("_used", [])), rng)
         return {
             "phase": "play",
             "player_ids": ids,
@@ -36,6 +36,7 @@ class WhoAmI(Game):
             "gave_up": [],
             "deadline": now + PLAY_SECONDS,
             "points": {pid: 0 for pid in ids},
+            "_used": chars,
         }
 
     def act(self, state, player_id, action, now):

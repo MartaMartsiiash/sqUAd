@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type GameMeta } from "../api/client";
 import { useAuth } from "../auth/auth";
-import { ChromeBlob, ChromeSquiggle, Logo, Num, Page } from "../components/ui";
+import { Blob, Glare, Logo, Num, Page } from "../components/ui";
 
 const CODE_CHARS = /[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g;
 
@@ -23,16 +23,18 @@ export default function Home() {
 
   return (
     <Page wide>
-      {/* Hero: the wordmark over a chrome shape and a red glow. */}
-      <section className="relative overflow-hidden pb-6 pt-4">
-        <ChromeBlob className="drift pointer-events-none absolute -right-14 top-2 w-44 opacity-75 sm:-right-4 sm:-top-6 sm:w-[19rem]" />
-        <div className="relative z-10">
+      {/* Hero: the brand wordmark over the red glare, with silver drops around it. */}
+      <section className="relative pb-6 pt-4">
+        <Glare className="absolute -left-10 top-6 w-[115%] max-w-none opacity-45 sm:-left-16 sm:w-[85%]" />
+        <Blob n={1} className="float absolute -right-8 top-14 w-20 [--r:12deg] sm:right-4 sm:-top-4 sm:w-40" />
+        <Blob n={5} className="float absolute bottom-0 right-[12%] hidden w-24 [--r:-20deg] [animation-delay:-4s] sm:block" />
+        <div className="relative">
           <div className="flex justify-between">
             <span className="label">party games</span>
             <span className="label">for your squad</span>
           </div>
-          <h1 className="pop relative mt-6 w-fit">
-            <Logo glossy className="relative block text-[18.5vw] leading-[0.95] sm:text-[8.5rem]" />
+          <h1 className="pop mt-8">
+            <Logo className="h-[22vw] max-h-48 sm:h-40" />
           </h1>
           <div className="mt-8 grid max-w-xl gap-4">
             <p className="relative max-w-md text-lg leading-snug">
@@ -85,7 +87,7 @@ export default function Home() {
 
       {games.length > 0 && (
         <section className="relative mt-14">
-          <ChromeSquiggle className="pointer-events-none absolute -top-14 right-2 w-28 -rotate-12 sm:-top-20 sm:w-40" />
+          <Blob n={2} className="float absolute -top-14 right-0 w-24 [--r:-10deg] sm:-top-20 sm:w-36" />
           <div className="flex items-end justify-between border-b border-line pb-3">
             <h2 className="display text-3xl sm:text-5xl">Ігри</h2>
             <span className="label">{games.length} на вечір</span>
