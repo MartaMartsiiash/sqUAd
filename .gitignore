@@ -19,3 +19,4 @@ dist/
 .terraform.lock.hcl
 .env.production
 .env.local
+*.tsbuildinfo
