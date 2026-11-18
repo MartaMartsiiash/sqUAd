@@ -18,6 +18,8 @@ MAX_PLAYERS = 16
 MAX_NAME_LENGTH = 20
 
 # Avatar colours: a chrome mannequin head in each (frontend/public/heads/<name>.png).
+OFFLINE_AFTER_SECONDS = 15
+
 AVATAR_COLORS = ["silver", "cherry", "rose", "violet", "gold", "ice", "graphite", "mint"]
 
 
@@ -58,7 +60,7 @@ class Player:
             "name": self.name,
             "color": self.color,
             "is_host": self.is_host,
-            "online": now - self.last_seen < 15,
+            "online": now - self.last_seen < OFFLINE_AFTER_SECONDS,
         }
 
 
@@ -104,10 +106,25 @@ class Room:
         name = " ".join(name.split())[:MAX_NAME_LENGTH]
         if not name:
             raise DomainError("bad_name", "Введіть ім'я")
+        same = next((p for p in self.players if p.name.casefold() == name.casefold()), None)
+        if same is not None:
+            # Coming back from another browser (a link opened in Telegram, then Safari):
+            # each browser keeps its own session, so the old one is lost. If that player
+            # is offline, hand their seat, score and game role to the new browser.
+            if same.is_host or now - same.last_seen < OFFLINE_AFTER_SECONDS:
+                raise DomainError(
+                    "name_taken",
+                    "Гравець з цим ім'ям зараз онлайн. Якщо це ви, закрийте стару вкладку "
+                    "і спробуйте за 15 секунд",
+                    409,
+                )
+            same.token = secrets.token_urlsafe(24)
+            same.last_seen = now
+            if color in AVATAR_COLORS:
+                same.color = color
+            return same
         if len(self.players) >= MAX_PLAYERS:
             raise DomainError("room_full", f"У кімнаті вже {MAX_PLAYERS} гравців")
-        if any(p.name.casefold() == name.casefold() for p in self.players):
-            raise DomainError("name_taken", "Це ім'я вже зайняте, оберіть інше", 409)
         taken = [p.color for p in self.players]
         if color not in AVATAR_COLORS:
             free = [c for c in AVATAR_COLORS if c not in taken]

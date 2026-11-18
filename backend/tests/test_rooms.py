@@ -118,3 +118,20 @@ def test_avatar_colour(client, room_with_players):
     r = client.post(f"/api/rooms/{code}/join", json={"name": "Тарас", "color": "gold"})
     view = client.get(f"/api/rooms/{code}", headers=H(r.json()["token"])).json()
     assert view["me"]["color"] == "gold"
+
+
+def test_offline_player_can_come_back_from_another_browser(client, room_with_players, clock):
+    code, tokens = room_with_players
+    old = client.get(f"/api/rooms/{code}", headers=H(tokens["Олег"])).json()["me"]
+    clock.advance(20)  # Олег closed the tab; others keep playing
+    r = client.post(f"/api/rooms/{code}/join", json={"name": "Олег"})
+    assert r.status_code == 201
+    me = client.get(f"/api/rooms/{code}", headers=H(r.json()["token"])).json()["me"]
+    assert me["id"] == old["id"]  # same seat, same score
+    assert client.get(f"/api/rooms/{code}", headers=H(tokens["Олег"])).status_code == 403
+
+
+def test_host_seat_cannot_be_taken_by_name(client, room_with_players, clock):
+    code, _ = room_with_players
+    clock.advance(60)
+    assert client.post(f"/api/rooms/{code}/join", json={"name": "Марта"}).status_code == 409
