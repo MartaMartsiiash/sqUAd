@@ -13,6 +13,7 @@ jars to our webhook (PROJECT.md, section 7). The body looks like:
 
 from __future__ import annotations
 
+import json
 import re
 from typing import Any
 
@@ -35,6 +36,24 @@ class PaymentService:
         self.settings = settings
 
     def handle_webhook(self, body: dict[str, Any]) -> dict[str, Any]:
+        result = self._handle(body)
+        item = (body.get("data") or {}).get("statementItem") or {}
+        # One log line per webhook call: `make logs` shows what monobank sent and what we did.
+        print(
+            json.dumps(
+                {
+                    "event": "mono_webhook",
+                    "amount": item.get("amount"),
+                    "comment": item.get("comment"),
+                    "description": item.get("description"),
+                    "result": result,
+                },
+                ensure_ascii=False,
+            )
+        )
+        return result
+
+    def _handle(self, body: dict[str, Any]) -> dict[str, Any]:
         if body.get("type") != "StatementItem":
             return {"status": "ignored", "reason": "not a statement item"}
         data = body.get("data") or {}

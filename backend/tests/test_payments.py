@@ -75,3 +75,11 @@ def test_dynamodb_repository_conditional_writes():
     assert repo.add_payment({"id": "x", "time": 5, "amount_uah": 20.5}) is True
     assert repo.add_payment({"id": "x", "time": 5, "amount_uah": 20.5}) is False
     assert repo.list_payments()[0]["amount_uah"] == 20.5
+
+
+def test_owner_can_unlock_by_hand(client, room_with_players):
+    code, t = room_with_players
+    assert client.post(f"/api/payments/monobank/wrong/unlock/{code}").status_code == 404
+    r = client.post(f"/api/payments/monobank/s3cret/unlock/{code.lower()}")
+    assert r.json() == {"room_code": code, "unlocked": True}
+    assert client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()["premium"] is True

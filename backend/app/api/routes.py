@@ -137,6 +137,18 @@ async def mono_webhook(
     return payments.handle_webhook(body if isinstance(body, dict) else {})
 
 
+@router.post("/payments/monobank/{secret}/unlock/{code}")
+def mono_manual_unlock(
+    secret: str,
+    code: str,
+    settings: Settings = Depends(get_settings),
+    rooms: RoomService = Depends(get_room_service),
+) -> dict[str, Any]:
+    """For the owner: unlock a room by hand, e.g. when a donor mistyped the code."""
+    _check_secret(secret, settings)
+    return {"room_code": code.upper(), "unlocked": rooms.unlock_premium(code)}
+
+
 @router.get("/payments/monobank/{secret}/summary")
 def mono_summary(
     secret: str,

@@ -93,6 +93,7 @@ class Room:
     game_state: dict[str, Any] | None = None
     premium: bool = False  # unlimited games, after a donation
     games_started: int = 0
+    games_played: int = 0  # finished games: only these use up the free ones
     version: int = 0
 
     # ----- players -------------------------------------------------------
@@ -155,6 +156,7 @@ class Room:
             if pid in self.scores:
                 self.scores[pid] += pts
         self.history.append({"game_id": game_id, "title": title, "points": points, "at": now})
+        self.games_played += 1
 
     def leaderboard(self) -> list[dict[str, Any]]:
         rows = [{"player_id": p.id, "points": self.scores.get(p.id, 0)} for p in self.players]

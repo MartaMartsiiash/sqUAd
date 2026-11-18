@@ -70,10 +70,11 @@ class RoomService:
                 room.game_state["_awarded"] = True
 
     def _free_left(self, room: Room) -> int | None:
-        """Free games left in this room, or None when the room has unlimited games."""
+        """Free games left in this room, or None when the room has unlimited games.
+        Only finished games count: starting a game and stopping it does not use one up."""
         if room.premium:
             return None
-        return max(0, self.settings.free_games - room.games_started)
+        return max(0, self.settings.free_games - room.games_played)
 
     def _require_host(self, room: Room, token: str | None) -> None:
         if not room.player_by_token(token).is_host:

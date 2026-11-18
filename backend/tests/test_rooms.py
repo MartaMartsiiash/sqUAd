@@ -61,12 +61,32 @@ def test_only_host_starts_games_and_kicks(client, room_with_players):
     assert client.get(f"/api/rooms/{code}", headers=H(t["Іра"])).status_code == 403
 
 
-def test_two_free_games_then_locked_until_paid(client, room_with_players, rooms):
+def test_two_free_games_then_locked_until_paid(client, room_with_players, rooms, clock):
     code, t = room_with_players
-    for game_id in ["who_of_us", "who_of_us"]:  # playing the same game again counts too
-        r = client.post(f"/api/rooms/{code}/games", json={"game_id": game_id}, headers=H(t["Марта"]))
-        assert r.status_code == 200
+
+    def play_one_round_of_associations():
+        r = client.post(
+            f"/api/rooms/{code}/games",
+            json={"game_id": "associations", "settings": {"rounds": 1}},
+            headers=H(t["Марта"]),
+        )
+        assert r.status_code == 200, r.text
+        clock.advance(31)
+        client.get(f"/api/rooms/{code}", headers=H(t["Марта"]))
+        clock.advance(13)
+        assert (
+            client.get(f"/api/rooms/{code}", headers=H(t["Марта"])).json()["game"]["view"]["phase"]
+            == "finished"
+        )
         client.post(f"/api/rooms/{code}/games/stop", headers=H(t["Марта"]))
+
+    # Starting and stopping a game does not use up a free one.
+    client.post(f"/api/rooms/{code}/games", json={"game_id": "spy"}, headers=H(t["Марта"]))
+    client.post(f"/api/rooms/{code}/games/stop", headers=H(t["Марта"]))
+    assert client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()["free_left"] == 2
+
+    play_one_round_of_associations()
+    play_one_round_of_associations()  # the same game again counts too
     view = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()
     assert view["free_left"] == 0 and all(g["locked"] for g in view["games"])
     r = client.post(f"/api/rooms/{code}/games", json={"game_id": "spy"}, headers=H(t["Марта"]))
@@ -74,9 +94,6 @@ def test_two_free_games_then_locked_until_paid(client, room_with_players, rooms)
     rooms.unlock_premium(code)
     view = client.get(f"/api/rooms/{code}", headers=H(t["Олег"])).json()
     assert view["free_left"] is None and not any(g["locked"] for g in view["games"])
-    for _ in range(3):
-        r = client.post(f"/api/rooms/{code}/games", json={"game_id": "spy"}, headers=H(t["Марта"]))
-        assert r.status_code == 200
 
 
 def test_reconnect_with_the_same_token(client, room_with_players):

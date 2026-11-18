@@ -9,7 +9,7 @@ TF_DIR := infra
 tf-out = $(TF) -chdir=$(TF_DIR) output -raw $(1)
 
 .PHONY: help dev api web test lint build-lambda deploy infra frontend-env deploy-frontend \
-        mono-webhook payments outputs destroy
+        mono-webhook unlock logs payments outputs destroy
 
 help: ## Show this list
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -77,6 +77,13 @@ mono-webhook: ## Point monobank at our webhook (asks for your monobank token, do
 	read -rsp "monobank token (api.monobank.ua): " token; echo; \
 	curl -sS -X POST https://api.monobank.ua/personal/webhook -H "X-Token: $$token" \
 		-H "Content-Type: application/json" -d "{\"webHookUrl\": \"$$url\"}"; echo
+
+unlock: ## Unlock unlimited games for a room by hand: make unlock CODE=K7Q2M
+	@test -n "$(CODE)" || { echo "Usage: make unlock CODE=K7Q2M"; exit 1; }
+	@curl -sS -X POST "$$($(call tf-out,mono_webhook_url))/unlock/$(CODE)"; echo
+
+logs: ## Show the API's logs from the last hour (webhook calls included)
+	$(AWS) logs tail "/aws/lambda/$$($(call tf-out,api_function))" --since 1h --region "$$($(call tf-out,region))"
 
 payments: ## List every tracked donation (for the demo report)
 	@curl -sS "$$($(call tf-out,mono_webhook_url))/summary" | $(PYTHON) -m json.tool --no-ensure-ascii

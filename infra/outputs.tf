@@ -35,3 +35,11 @@ output "mono_webhook_url" {
   value     = "${trimsuffix(aws_lambda_function_url.api.function_url, "/")}/api/payments/monobank/${random_password.mono_webhook.result}"
   sensitive = true
 }
+
+output "region" {
+  value = var.region
+}
+
+output "api_function" {
+  value = aws_lambda_function.api.function_name
+}
