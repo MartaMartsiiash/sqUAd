@@ -102,4 +102,4 @@ To remove everything: `make destroy`.
 
 ## Team
 
-Marta Martsiiash, Veronika Parkhomenko — Object-Oriented Analysis and Design, UCU, 2026.
+Marta Martsiiash, Veronika Parkhomenko (Марціяш Марта, Пархоменко Вероніка) — Object-Oriented Analysis and Design, UCU, 2026.
